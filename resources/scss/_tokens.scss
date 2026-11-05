@@ -1,0 +1,23 @@
+// Identidad de SIGIT. Vocabulario: el fichero de la biblioteca (ficha con renglones
+// y perforación) y Yucatán (azul maya, caliza, achiote, henequén).
+$ceiba: #0f3d47;      // fondo del login y navegación
+$azul-maya: #146c7e;  // acción principal y enlaces
+$azul-maya-claro: #6fc6d1; // acento sobre fondo oscuro
+$caliza: #f1f4f1;     // fondo de la aplicación
+$tinta: #16282d;      // texto
+$achiote: #a8321c;    // errores y renglón de encabezado de la ficha
+$henequen: #2f6b46;   // confirmaciones
+$miel: #855600;       // avisos
+$linea: #c7d3d2;      // bordes y renglones
+
+:root {
+    --sigit-ceiba: #{$ceiba};
+    --sigit-azul-maya: #{$azul-maya};
+    --sigit-azul-maya-claro: #{$azul-maya-claro};
+    --sigit-caliza: #{$caliza};
+    --sigit-tinta: #{$tinta};
+    --sigit-achiote: #{$achiote};
+    --sigit-henequen: #{$henequen};
+    --sigit-miel: #{$miel};
+    --sigit-linea: #{$linea};
+}

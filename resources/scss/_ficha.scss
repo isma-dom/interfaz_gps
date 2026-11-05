@@ -1,0 +1,188 @@
+// P-01: el acceso es una ficha del catálogo de la biblioteca, con su renglón rojo de
+// encabezado, sus renglones azules y la perforación por donde pasa la varilla del fichero.
+.pagina-ficha {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: var(--sigit-ceiba);
+}
+
+.ficha {
+    --renglon: 1.5rem;
+    position: relative;
+    width: 100%;
+    max-width: 27rem;
+    padding: 0 1.5rem calc(var(--renglon) * 4);
+    border-radius: .25rem;
+    background-color: #fff;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(var(--renglon) - 1px),
+        rgba($azul-maya, .2) calc(var(--renglon) - 1px),
+        rgba($azul-maya, .2) var(--renglon)
+    );
+
+    // Perforación: deja ver el fondo de la página.
+    &::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: var(--renglon);
+        width: 1.5rem;
+        height: 1.5rem;
+        margin-left: -.75rem;
+        border-radius: 50%;
+        background: var(--sigit-ceiba);
+    }
+
+    h1 {
+        margin: 0;
+        padding-top: var(--renglon);
+        font-size: 1.5rem;
+        line-height: calc(var(--renglon) * 2);
+    }
+}
+
+.ficha--entra {
+    @media (prefers-reduced-motion: no-preference) {
+        animation: ficha-sale-del-fichero .45s cubic-bezier(.2, .7, .2, 1) both;
+    }
+}
+
+@keyframes ficha-sale-del-fichero {
+    from {
+        transform: translateY(1.5rem);
+    }
+
+    to {
+        transform: none;
+    }
+}
+
+.ficha__encabezado {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    height: calc(var(--renglon) * 4);
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem .5rem;
+    border-bottom: 2px solid var(--sigit-achiote);
+    border-radius: .25rem .25rem 0 0;
+    background: #fff;
+}
+
+.ficha__sigla {
+    font-family: $headings-font-family;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -.01em;
+    color: var(--sigit-ceiba);
+}
+
+.ficha__institucion {
+    font-size: .875rem;
+    line-height: 1.25;
+    text-align: right;
+    color: var(--sigit-tinta);
+}
+
+.ficha__indicacion {
+    margin: 0;
+    line-height: var(--renglon);
+}
+
+.ficha__campo {
+    margin-top: var(--renglon);
+}
+
+.ficha__campo .form-label {
+    display: block;
+    margin: 0;
+    font-weight: 700;
+    line-height: var(--renglon);
+}
+
+.ficha__campo .form-control {
+    height: calc(var(--renglon) * 2);
+    padding: .25rem .5rem;
+    border: 0;
+    border-bottom: 2px solid var(--sigit-tinta);
+    border-radius: 0;
+    background-color: #eef4f5;
+    background-image: none;
+    box-shadow: none;
+
+    &:focus {
+        border-bottom-color: var(--sigit-azul-maya);
+        background-color: #e3eef0;
+        outline: 3px solid var(--sigit-azul-maya);
+        outline-offset: 1px;
+    }
+
+    &.is-invalid {
+        border-bottom-color: var(--sigit-achiote);
+    }
+}
+
+.ficha__contrasena {
+    position: relative;
+
+    .form-control {
+        padding-right: 3.25rem;
+    }
+
+    .boton-ver {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 3rem;
+        height: calc(var(--renglon) * 2);
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--sigit-tinta);
+    }
+}
+
+.ficha__error {
+    margin: 0;
+    font-size: .9375rem;
+    line-height: var(--renglon);
+    color: var(--sigit-achiote);
+    font-weight: 700;
+    background: #fff;
+}
+
+.ficha__aviso {
+    margin: var(--renglon) 0 0;
+    padding: calc(var(--renglon) / 2) .75rem;
+    border-left: 4px solid var(--sigit-miel);
+    line-height: var(--renglon);
+    background: #fff;
+    color: var(--sigit-tinta);
+}
+
+.ficha__accion {
+    width: 100%;
+    height: calc(var(--renglon) * 2);
+    margin-top: var(--renglon);
+    padding-block: 0;
+    font-weight: 700;
+}
+
+.ficha__ayuda {
+    margin: var(--renglon) 0 0;
+    font-size: .9375rem;
+    line-height: var(--renglon);
+}
+
+@media (max-width: 22rem) {
+    .ficha__institucion {
+        font-size: .8125rem;
+    }
+}

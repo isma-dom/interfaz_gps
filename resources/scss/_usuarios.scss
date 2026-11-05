@@ -1,0 +1,144 @@
+// P-11. En celular, cada fila de la tabla se lee como una ficha.
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: .75rem;
+    margin-bottom: 1.25rem;
+
+    &__busqueda {
+        flex: 1 1 16rem;
+    }
+
+    &__rol {
+        flex: 0 1 13rem;
+    }
+
+    .form-label {
+        margin-bottom: .25rem;
+        font-weight: 700;
+    }
+}
+
+.tabla-usuarios {
+    --bs-table-bg: #fff;
+    --bs-table-color: var(--sigit-tinta);
+    margin: 0;
+
+    th {
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    td,
+    th {
+        padding: .75rem 1rem;
+        vertical-align: middle;
+    }
+
+    &__inactivo td {
+        color: #4c5f65;
+    }
+
+    &__acciones {
+        display: flex;
+        justify-content: flex-end;
+        gap: .5rem;
+    }
+}
+
+.estado-usuario {
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
+    white-space: nowrap;
+
+    &--activo .bi {
+        color: var(--sigit-henequen);
+    }
+
+    &--inactivo .bi {
+        color: var(--sigit-achiote);
+    }
+}
+
+.etiqueta-tu {
+    margin-left: .375rem;
+    padding: 0 .375rem;
+    border: 1px solid var(--sigit-azul-maya);
+    border-radius: $border-radius-sm;
+    font-size: .8125rem;
+    color: var(--sigit-azul-maya);
+}
+
+.tabla-marco {
+    border: 1px solid var(--sigit-linea);
+    border-radius: $border-radius-lg;
+    overflow: hidden;
+}
+
+// Con la navegación lateral, la tabla completa solo cabe desde 1200 px.
+@include media-breakpoint-down(xl) {
+    .tabla-usuarios {
+        thead {
+            @include visually-hidden;
+        }
+
+        tr {
+            display: block;
+            padding: .75rem 1rem;
+            border-bottom: 1px solid var(--sigit-linea);
+            background: #fff;
+        }
+
+        tbody tr:last-child {
+            border-bottom: 0;
+        }
+
+        td {
+            display: grid;
+            grid-template-columns: 4.5rem minmax(0, 1fr);
+            gap: .5rem;
+            padding: .25rem 0;
+            border: 0;
+            overflow-wrap: anywhere;
+
+            &::before {
+                content: attr(data-etiqueta);
+                font-weight: 700;
+            }
+        }
+
+        td.tabla-usuarios__nombre {
+            display: block;
+            font-size: 1.0625rem;
+            font-weight: 700;
+
+            &::before {
+                content: none;
+            }
+        }
+
+        td.tabla-usuarios__celda-acciones {
+            display: block;
+            padding-top: .75rem;
+
+            &::before {
+                content: none;
+            }
+        }
+
+        &__acciones {
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+    }
+}
+
+.formulario-usuario {
+    max-width: 38rem;
+
+    .form-label {
+        font-weight: 700;
+    }
+}

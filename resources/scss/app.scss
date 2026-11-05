@@ -1,1 +1,64 @@
-// Estilos de SIGIT
+@import 'tokens';
+
+// Variables de Bootstrap
+$primary: $azul-maya;
+$secondary: #4c5f65;
+$success: $henequen;
+$info: $azul-maya;
+$warning: $miel;
+$danger: $achiote;
+$light: $caliza;
+$dark: $ceiba;
+
+$body-bg: $caliza;
+$body-color: $tinta;
+$link-color: $azul-maya;
+$border-color: $linea;
+$border-radius: .1875rem;
+$border-radius-sm: .1875rem;
+$border-radius-lg: .25rem;
+
+$font-family-sans-serif: 'Atkinson Hyperlegible', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$headings-font-family: 'Literata Variable', Georgia, 'Times New Roman', serif;
+$headings-font-weight: 600;
+$h1-font-size: 1.875rem;
+$h2-font-size: 1.375rem;
+
+// Controles de al menos 44 px de alto: se usan con el dedo durante el levantamiento físico.
+$input-btn-padding-y: .6rem;
+$input-btn-padding-x: .875rem;
+$btn-padding-x: 1.125rem;
+$pagination-padding-y: .6rem;
+$pagination-padding-x: .95rem;
+$btn-close-padding-x: .9em;
+$btn-close-padding-y: .9em;
+$input-bg: #fff;
+$form-select-bg: #fff;
+$table-border-color: $linea;
+$modal-content-bg: #fff;
+$modal-backdrop-bg: $ceiba;
+$modal-backdrop-opacity: .6;
+
+@import 'bootstrap/scss/bootstrap';
+
+:focus-visible {
+    outline: 3px solid var(--sigit-azul-maya);
+    outline-offset: 2px;
+}
+
+.saltar-contenido {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 2000;
+    padding: .75rem 1rem;
+    background: #fff;
+
+    &:focus {
+        top: 1rem;
+    }
+}
+
+@import 'ficha';
+@import 'aplicacion';
+@import 'usuarios';

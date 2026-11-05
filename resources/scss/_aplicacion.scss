@@ -1,0 +1,221 @@
+// Layout: navegación lateral fija en escritorio y menú desplegable en celular.
+.app-marco {
+    display: flex;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.app-lateral {
+    flex: 0 0 auto;
+}
+
+@include media-breakpoint-up(lg) {
+    .app-lateral {
+        position: sticky;
+        top: 0;
+        width: 16rem;
+        height: 100vh;
+        overflow-y: auto;
+        background: var(--sigit-ceiba);
+    }
+}
+
+.app-lateral .offcanvas-lg {
+    --bs-offcanvas-bg: var(--sigit-ceiba);
+    --bs-offcanvas-color: #fff;
+    --bs-offcanvas-width: 18rem;
+    color: #fff;
+}
+
+.app-marca {
+    display: block;
+    padding: 1.25rem 1.25rem 1rem;
+    color: #fff;
+    text-decoration: none;
+
+    // Espacio del logotipo oficial: se entrega en el Sprint 3.
+    &__sigla {
+        display: block;
+        font-family: $headings-font-family;
+        font-size: 1.625rem;
+        font-weight: 600;
+        line-height: 1.1;
+    }
+
+    &__institucion {
+        display: block;
+        font-size: .875rem;
+        color: #d5e5e8;
+    }
+
+    &:hover,
+    &:focus {
+        color: #fff;
+    }
+}
+
+.app-menu {
+    list-style: none;
+    margin: 0;
+    padding: .25rem 0 1rem;
+
+    a {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        min-height: 2.875rem;
+        padding: .5rem 1.25rem;
+        border-left: 4px solid transparent;
+        color: #e8f1f2;
+        text-decoration: none;
+
+        &:hover {
+            background: rgba(255, 255, 255, .08);
+            color: #fff;
+        }
+
+        &:focus-visible {
+            outline-color: var(--sigit-azul-maya-claro);
+            outline-offset: -3px;
+        }
+
+        &[aria-current='page'] {
+            border-left-color: var(--sigit-azul-maya-claro);
+            background: rgba(255, 255, 255, .12);
+            color: #fff;
+            font-weight: 700;
+        }
+    }
+
+    .bi {
+        font-size: 1.125rem;
+    }
+}
+
+.app-lateral .btn-close {
+    filter: invert(1) grayscale(1) brightness(2);
+}
+
+.app-lateral .btn-close:focus {
+    box-shadow: 0 0 0 3px var(--sigit-azul-maya-claro);
+}
+
+.app-cuerpo {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-encabezado {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    min-height: 4rem;
+    padding: .5rem 1rem;
+    background: #fff;
+    border-bottom: 1px solid var(--sigit-linea);
+
+    @include media-breakpoint-up(md) {
+        padding-inline: 2rem;
+    }
+
+    &__sigla {
+        font-family: $headings-font-family;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--sigit-ceiba);
+    }
+
+    &__usuario {
+        margin-left: auto;
+        line-height: 1.25;
+        text-align: right;
+        min-width: 0;
+    }
+
+    &__nombre {
+        display: block;
+        font-weight: 700;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__rol {
+        display: block;
+        font-size: .875rem;
+    }
+}
+
+.app-principal {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 72rem;
+    padding: 1.5rem 1rem 3rem;
+
+    @include media-breakpoint-up(md) {
+        padding: 2rem 2rem 3rem;
+    }
+}
+
+.titulo-pagina {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: .75rem 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: .75rem;
+    border-bottom: 2px solid var(--sigit-achiote);
+
+    h1 {
+        margin: 0;
+    }
+}
+
+.superficie {
+    padding: 1.25rem;
+    background: #fff;
+    border: 1px solid var(--sigit-linea);
+    border-radius: $border-radius-lg;
+}
+
+.texto-acotado {
+    max-width: 38rem;
+}
+
+// Mensajes: el icono y el texto dicen lo mismo que el color.
+.aviso {
+    display: flex;
+    gap: .625rem;
+    margin-bottom: 1.25rem;
+    padding: .75rem 1rem;
+    border-left: 4px solid currentColor;
+    background: #fff;
+
+    > span {
+        color: var(--sigit-tinta);
+    }
+
+    &--exito {
+        color: var(--sigit-henequen);
+    }
+
+    &--error {
+        color: var(--sigit-achiote);
+    }
+}
+
+// Páginas de error
+.pagina-error {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+
+    &__contenido {
+        width: 100%;
+        max-width: 34rem;
+    }
+}

@@ -1,59 +1,101 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SIGIT
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de Gestión de Inventario Tecnológico de la Subdirección de Administración de la Biblioteca Benito Juárez.
 
-## About Laravel
+Esta rama contiene el módulo de autenticación y roles (RF-01, SS-01): pantallas P-01 y P-11, menú por rol y control de acceso. Stack: PHP 8.3, Laravel 12, MySQL 8.4, Blade y Bootstrap 5.3.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Levantar el proyecto con Sail
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Requiere Docker. Es el entorno de desarrollo oficial del proyecto.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```bash
+cp .env.example .env
+```
 
-## Learning Laravel
+Define en `.env` el valor de `SEED_PASSWORD` (ver [Usuarios de prueba](#usuarios-de-prueba)) y luego ejecuta:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+```bash
+docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html laravelsail/php83-composer:latest composer install --ignore-platform-reqs
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+./vendor/bin/sail up -d
+```
 
-## Laravel Sponsors
+```bash
+./vendor/bin/sail artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+./vendor/bin/sail artisan migrate:fresh --seed
+```
 
-### Premium Partners
+```bash
+./vendor/bin/sail npm ci
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+./vendor/bin/sail npm run build
+```
 
-## Contributing
+La aplicación queda en http://localhost.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Usuarios de prueba
 
-## Code of Conduct
+`DatosDePruebaSeeder` crea tres áreas de ejemplo y un usuario por rol. Solo se ejecuta en los entornos `local` y `testing`, nunca en producción.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Rol | Correo |
+|---|---|
+| Administrador | admin@sigit.test |
+| Ejecutivo | ejecutivo@sigit.test |
+| Consulta | consulta@sigit.test |
 
-## Security Vulnerabilities
+Los tres usan la contraseña de la variable `SEED_PASSWORD` de tu `.env`. Elige una con al menos 8 caracteres, letras y números. Si la dejas vacía, no se crean usuarios y el seeder lo avisa.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Pruebas y calidad
 
-## License
+```bash
+./vendor/bin/sail artisan test
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+./vendor/bin/sail pint --test
+```
+
+```bash
+./vendor/bin/sail bin phpstan analyse
+```
+
+Sin Docker, las pruebas también corren con PHP local y SQLite en memoria:
+
+```bash
+DB_CONNECTION=sqlite DB_DATABASE=:memory: php artisan test
+```
+
+## Configuración del módulo
+
+| Variable | Por omisión | Uso |
+|---|---|---|
+| `SESSION_LIFETIME` | 30 | Minutos de inactividad antes de que expire la sesión. |
+| `SIGIT_BLOQUEO_MINUTOS` | 15 | Duración del bloqueo tras 5 intentos fallidos con la misma cuenta. |
+| `SESSION_SECURE_COOKIE` | false | Usa `true` en staging y producción, con HTTPS. |
+| `SEED_PASSWORD` | vacío | Contraseña de los usuarios de prueba. |
+
+El menú y los permisos por pantalla se definen en `config/menu.php`; `routes/web.php` aplica esos roles a cada ruta.
+
+## Decisiones por confirmar con el Product Owner
+
+Los documentos del proyecto no definen estos puntos:
+
+- Duración del bloqueo temporal: 15 minutos.
+- Política de contraseñas: mínimo 8 caracteres, con letras y números.
+- Página de inicio: Administrador y Ejecutivo llegan a `/tablero`; Consulta, a `/equipos`.
+- Rutas web de las pantallas; el diseño solo define las de la API.
+- Aviso de sesión 2 minutos antes de expirar, con el botón «Seguir conectado».
+- Un administrador no puede desactivarse ni quitarse el rol, y el sistema no puede quedarse sin administradores activos.
+
+## Pendiente fuera de este módulo
+
+- API con Sanctum (`/api/v1/auth/login`): el evento PI-01 la exige, y `VerificarRol` ya responde JSON 403 para reutilizarlo.
+- Logotipo oficial: sustituir el texto de `resources/views/partials/marca.blade.php` y de `resources/views/auth/login.blade.php`.
+- Consulta de bitácora y `BitacoraObserver` (Sprint 4), CRUD de catálogos (P-10) y el resto de las pantallas, que hoy muestran «todavía no está disponible».

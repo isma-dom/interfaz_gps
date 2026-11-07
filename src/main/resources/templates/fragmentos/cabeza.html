@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="cabeza(titulo)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <meta name="csrf-token" th:if="${_csrf != null}" th:content="${_csrf.token}">
+    <title th:text="${titulo} + ' | SIGIT'">SIGIT</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.min.css}">
+    <link rel="stylesheet" th:href="@{/css/sigit.css}">
+    <script defer th:src="@{/webjars/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+    <script defer th:src="@{/js/sigit.js}"></script>
+</head>
+</html>

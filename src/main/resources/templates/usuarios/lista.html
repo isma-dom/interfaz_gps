@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/pagina :: pagina('Usuarios', ~{::#acciones}, ~{::#cuerpo-pagina})}">
+<body>
+<a id="acciones" class="btn btn-primary" th:href="@{/usuarios/nuevo}">
+    <i class="bi bi-person-plus" aria-hidden="true"></i> Agregar usuario
+</a>
+
+<section id="cuerpo-pagina">
+    <form class="filtros" method="get" th:action="@{/usuarios}" role="search">
+        <div class="filtros__busqueda">
+            <label class="form-label" for="q">Buscar por nombre o correo</label>
+            <input class="form-control" id="q" name="q" type="search" th:value="${q}">
+        </div>
+        <div class="filtros__rol">
+            <label class="form-label" for="rol">Rol</label>
+            <select class="form-select" id="rol" name="rol">
+                <option value="">Todos</option>
+                <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.nombre}"
+                        th:selected="${rolId == r.id}">Rol</option>
+            </select>
+        </div>
+        <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        <a class="btn btn-link" th:href="@{/usuarios}" th:if="${q != '' or rolId != null}">Quitar filtros</a>
+    </form>
+
+    <div class="superficie" th:if="${usuarios.empty}">
+        <p class="mb-0">Ningún usuario coincide con la búsqueda. Prueba con otro nombre o quita los filtros.</p>
+    </div>
+
+    <th:block th:unless="${usuarios.empty}">
+        <div class="tabla-marco">
+            <table class="table tabla-usuarios">
+                <caption class="visually-hidden">Usuarios del sistema</caption>
+                <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Rol</th>
+                    <th scope="col">Área</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col" class="text-end">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${usuarios}" th:classappend="${!u.activo} ? 'tabla-usuarios__inactivo'"
+                    th:with="esUnoMismo=${u.id == usuarioActual.id}">
+                    <td class="tabla-usuarios__nombre">
+                        <span th:text="${u.nombre}">Nombre</span>
+                        <span class="etiqueta-tu" th:if="${esUnoMismo}">Tú</span>
+                    </td>
+                    <td data-etiqueta="Correo" th:text="${u.correo}">correo</td>
+                    <td data-etiqueta="Rol" th:text="${u.rol.nombre}">Rol</td>
+                    <td data-etiqueta="Área" th:text="${u.area != null ? u.area.nombre : 'Sin área'}">Área</td>
+                    <td data-etiqueta="Estado">
+                        <span class="estado-usuario estado-usuario--activo" th:if="${u.activo}">
+                            <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Activo
+                        </span>
+                        <span class="estado-usuario estado-usuario--inactivo" th:unless="${u.activo}">
+                            <i class="bi bi-slash-circle" aria-hidden="true"></i> Inactivo
+                        </span>
+                    </td>
+                    <td class="tabla-usuarios__celda-acciones">
+                        <div class="tabla-usuarios__acciones">
+                            <a class="btn btn-outline-primary" th:href="@{/usuarios/{id}/editar(id=${u.id})}"
+                               th:aria-label="|Editar a ${u.nombre}|">Editar</a>
+                            <button class="btn btn-outline-danger" type="button" th:if="${u.activo and !esUnoMismo}"
+                                    data-bs-toggle="modal" data-bs-target="#modal-desactivar"
+                                    th:data-url="@{/usuarios/{id}/desactivar(id=${u.id})}" th:data-nombre="${u.nombre}"
+                                    th:aria-label="|Desactivar a ${u.nombre}|">Desactivar</button>
+                            <form method="post" th:action="@{/usuarios/{id}/reactivar(id=${u.id})}" th:unless="${u.activo}">
+                                <button class="btn btn-outline-primary" type="submit"
+                                        th:aria-label="|Reactivar a ${u.nombre}|">Reactivar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="mt-3" aria-label="Páginas de usuarios" th:if="${usuarios.totalPages > 1}">
+            <ul class="pagination flex-wrap">
+                <li class="page-item" th:classappend="${usuarios.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/usuarios(q=${q},rol=${rolId},pagina=${usuarios.number})}">Anterior</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(1, usuarios.totalPages)}"
+                    th:classappend="${i == usuarios.number + 1} ? 'active'">
+                    <a class="page-link" th:href="@{/usuarios(q=${q},rol=${rolId},pagina=${i})}" th:text="${i}"
+                       th:aria-current="${i == usuarios.number + 1} ? 'page'">1</a>
+                </li>
+                <li class="page-item" th:classappend="${usuarios.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/usuarios(q=${q},rol=${rolId},pagina=${usuarios.number + 2})}">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+    </th:block>
+
+    <div class="modal fade" id="modal-desactivar" tabindex="-1" aria-labelledby="modal-desactivar-titulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <!--/* La acción la fija sigit.js con la URL del botón que abrió el modal. */-->
+            <form class="modal-content" method="post" th:action="@{/usuarios}">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="modal-desactivar-titulo">¿Desactivar a <span data-nombre></span>?</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    Ya no podrá iniciar sesión y perderá el acceso de inmediato. Su historial se conserva y puedes
+                    reactivarlo cuando quieras.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Desactivar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/* Campos compartidos por el alta y la edición. */-->
+<div th:fragment="campos(textoBoton)" class="superficie formulario-usuario" th:object="${usuario}"
+     th:with="esUnoMismo=${existente != null and existente.id == usuarioActual.id},
+              rolConsulta=${roles.?[nombre == 'Consulta']}">
+
+    <div class="aviso aviso--error" role="alert" th:if="${#fields.hasGlobalErrors()}">
+        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+        <span th:each="e : ${#fields.globalErrors()}" th:text="${e}">Error</span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="nombre">Nombre</label>
+        <input class="form-control" type="text" th:field="*{nombre}" maxlength="120" autocomplete="off" required
+               th:errorclass="is-invalid" th:aria-describedby="${#fields.hasErrors('nombre')} ? 'nombre-error'">
+        <div class="invalid-feedback" id="nombre-error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">Error</div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="correo">Correo</label>
+        <input class="form-control" type="email" th:field="*{correo}" maxlength="150" autocomplete="off"
+               autocapitalize="none" spellcheck="false" required th:errorclass="is-invalid"
+               th:aria-describedby="${#fields.hasErrors('correo')} ? 'correo-error'">
+        <div class="invalid-feedback" id="correo-error" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}">Error</div>
+    </div>
+
+    <div class="mb-3">
+        <th:block th:if="${esUnoMismo}">
+            <span class="form-label d-block">Rol</span>
+            <input type="hidden" id="rolId" name="rolId" th:value="${existente.rol.id}">
+            <p class="mb-0" th:text="|${existente.rol.nombre}. No puedes cambiar tu propio rol.|">Rol</p>
+        </th:block>
+        <th:block th:unless="${esUnoMismo}">
+            <label class="form-label" for="rolId">Rol</label>
+            <select class="form-select" th:field="*{rolId}" required th:errorclass="is-invalid"
+                    th:aria-describedby="${#fields.hasErrors('rolId')} ? 'rol-error'">
+                <option value="">Elige un rol</option>
+                <option th:each="r : ${roles}" th:value="${r.id}" th:text="${r.nombre}">Rol</option>
+            </select>
+        </th:block>
+        <div class="invalid-feedback d-block" id="rol-error" th:if="${#fields.hasErrors('rolId')}" th:errors="*{rolId}">Error</div>
+    </div>
+
+    <div class="mb-3" id="campo-area" th:data-rol-consulta="${rolConsulta.isEmpty() ? '' : rolConsulta[0].id}">
+        <label class="form-label" for="areaId">Área</label>
+        <select class="form-select" th:field="*{areaId}" th:errorclass="is-invalid"
+                th:aria-describedby="${#fields.hasErrors('areaId')} ? 'area-ayuda area-error' : 'area-ayuda'">
+            <option value="">Elige un área</option>
+            <option th:each="a : ${areas}" th:value="${a.id}" th:text="${a.nombre}">Área</option>
+        </select>
+        <div class="form-text" id="area-ayuda">Solo para el rol Consulta: verá los equipos y resguardos de esta área.</div>
+        <div class="invalid-feedback" id="area-error" th:if="${#fields.hasErrors('areaId')}" th:errors="*{areaId}">Error</div>
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label" for="password">Contraseña</label>
+        <div class="input-group has-validation">
+            <input class="form-control" id="password" name="password" type="password" autocomplete="new-password"
+                   th:required="${existente == null}" th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                   th:aria-describedby="${#fields.hasErrors('password')} ? 'password-ayuda password-error' : 'password-ayuda'">
+            <button class="btn btn-outline-secondary" type="button" data-ver-contrasena="password" aria-pressed="false"
+                    aria-label="Mostrar contraseña">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+            </button>
+            <div class="invalid-feedback" id="password-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</div>
+        </div>
+        <div class="form-text" id="password-ayuda">
+            Mínimo 8 caracteres, con letras y números.<th:block th:if="${existente != null}"> Déjala vacía para conservar la actual.</th:block>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-primary" type="submit" th:text="${textoBoton}">Guardar</button>
+        <a class="btn btn-outline-secondary" th:href="@{/usuarios}">Cancelar</a>
+    </div>
+</div>
+</body>
+</html>

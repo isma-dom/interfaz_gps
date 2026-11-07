@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/pagina :: pagina('Editar usuario', ~{}, ~{::#cuerpo-pagina})}">
+<body>
+<form id="cuerpo-pagina" method="post" th:action="@{/usuarios/{id}(id=${existente.id})}" novalidate>
+    <div th:replace="~{usuarios/formulario :: campos('Guardar cambios')}"></div>
+</form>
+</body>
+</html>

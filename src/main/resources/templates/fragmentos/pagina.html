@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--/* Layout de las pantallas con sesión: navegación lateral en escritorio y menú desplegable en celular. */-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:fragment="pagina(titulo, acciones, contenido)">
+<head th:replace="~{fragmentos/cabeza :: cabeza(${titulo})}"></head>
+<body th:data-sesion-minutos="${sesion.minutos()}"
+      th:data-sesion-aviso-minutos="${sesion.avisoMinutos()}"
+      th:data-sesion-url-mantener="@{/sesion/mantener}"
+      th:data-sesion-url-expirada="@{/login(expirada=1)}">
+<a class="saltar-contenido" href="#contenido">Saltar al contenido</a>
+
+<div class="app-marco">
+    <div class="app-lateral">
+        <div class="offcanvas-lg offcanvas-start h-100" id="menu-lateral" tabindex="-1" aria-label="Menú">
+            <div class="d-flex align-items-start justify-content-between">
+                <!--/* Sustituir por el logotipo oficial cuando el cliente lo entregue (actividad 3.2). */-->
+                <a class="app-marca" th:href="@{/}">
+                    <span class="app-marca__sigla">SIGIT</span>
+                    <span class="app-marca__institucion">Biblioteca Benito Juárez</span>
+                </a>
+                <button type="button" class="btn-close m-2 d-lg-none" data-bs-dismiss="offcanvas"
+                        data-bs-target="#menu-lateral" aria-label="Cerrar menú"></button>
+            </div>
+            <nav aria-label="Menú principal">
+                <ul class="app-menu">
+                    <li th:each="pantalla : ${menu}">
+                        <a th:href="@{${pantalla.ruta}}"
+                           th:aria-current="${rutaActual == pantalla.ruta or #strings.startsWith(rutaActual, pantalla.ruta + '/')} ? 'page'">
+                            <i th:class="|bi bi-${pantalla.icono}|" aria-hidden="true"></i>
+                            <span th:text="${pantalla.etiqueta}">Pantalla</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="app-cuerpo">
+        <header class="app-encabezado">
+            <button class="btn btn-outline-primary text-nowrap d-lg-none" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#menu-lateral" aria-controls="menu-lateral">
+                <i class="bi bi-list" aria-hidden="true"></i> Menú
+            </button>
+            <div class="app-encabezado__usuario">
+                <span class="app-encabezado__nombre" th:text="${usuarioActual.nombre}">Nombre</span>
+                <span class="app-encabezado__rol" th:text="${usuarioActual.rol}">Rol</span>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-outline-secondary text-nowrap" aria-label="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right d-sm-none" aria-hidden="true"></i>
+                    <span class="d-none d-sm-inline">Cerrar sesión</span>
+                </button>
+            </form>
+        </header>
+
+        <main class="app-principal" id="contenido" tabindex="-1">
+            <div class="titulo-pagina">
+                <h1 th:text="${titulo}">Título</h1>
+                <th:block th:replace="${acciones}"></th:block>
+            </div>
+
+            <div aria-live="polite">
+                <div class="aviso aviso--exito" role="status" th:if="${exito}">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                    <span th:text="${exito}">Hecho.</span>
+                </div>
+            </div>
+            <div class="aviso aviso--error" role="alert" th:if="${error}">
+                <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                <span th:text="${error}">Error.</span>
+            </div>
+
+            <th:block th:replace="${contenido}"></th:block>
+        </main>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-sesion" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+     aria-labelledby="modal-sesion-titulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="modal-sesion-titulo">Tu sesión está por terminar</h2>
+            </div>
+            <div class="modal-body"
+                 th:text="|Se cerrará en ${sesion.avisoMinutos()} minutos por inactividad. Lo que no hayas guardado se perderá.|">
+                Se cerrará pronto por inactividad.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="sesion-seguir">Seguir conectado</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

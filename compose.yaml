@@ -1,0 +1,15 @@
+# MySQL 8.4 para desarrollo. Spring Boot lo levanta solo al ejecutar ./mvnw spring-boot:run.
+services:
+  mysql:
+    image: 'mysql:8.4'
+    environment:
+      - 'MYSQL_DATABASE=sigit_dev'
+      - 'MYSQL_USER=sigit'
+      - 'MYSQL_PASSWORD=sigit'
+      - 'MYSQL_ROOT_PASSWORD=sigit_root'
+    ports:
+      - '127.0.0.1:${SIGIT_DB_PUERTO:-3306}:3306'
+    volumes:
+      - 'sigit-mysql:/var/lib/mysql'
+volumes:
+  sigit-mysql:

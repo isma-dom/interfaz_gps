@@ -24,7 +24,7 @@
                 <ul class="app-menu">
                     <li th:each="pantalla : ${menu}">
                         <a th:href="@{${pantalla.ruta}}"
-                           th:aria-current="${rutaActual == pantalla.ruta or #strings.startsWith(rutaActual, pantalla.ruta + '/')} ? 'page'">
+                           th:aria-current="${pantallaActiva == pantalla or rutaActual == pantalla.ruta or #strings.startsWith(rutaActual, pantalla.ruta + '/')} ? 'page'">
                             <i th:class="|bi bi-${pantalla.icono}|" aria-hidden="true"></i>
                             <span th:text="${pantalla.etiqueta}">Pantalla</span>
                         </a>

@@ -11,9 +11,13 @@
         if (formulario.method !== 'post' || evento.defaultPrevented) {
             return;
         }
-        formulario.querySelectorAll('[type="submit"]').forEach(function (boton) {
-            boton.disabled = true;
-        });
+        // Se desactivan después de que el navegador arma el envío: un botón desactivado durante
+        // el evento no envía su name (por ejemplo, «Registrar y agregar otro»).
+        setTimeout(function () {
+            formulario.querySelectorAll('[type="submit"]').forEach(function (boton) {
+                boton.disabled = true;
+            });
+        }, 0);
     });
 
     // Al volver con el botón Atrás, el navegador puede restaurar los botones desactivados.
@@ -155,7 +159,117 @@
         });
     }
 
+    /* ---------- P-05: formulario de equipo ---------- */
+
+    // Muestra solo las características técnicas del tipo de equipo elegido.
+    function iniciarCaracteristicasPorTipo() {
+        var tipo = document.querySelector('[data-tipo-equipo]');
+        if (!tipo) {
+            return;
+        }
+        var grupos = document.querySelectorAll('fieldset [data-grupo]');
+        var indicacion = document.querySelector('[data-sin-tipo]');
+
+        tipo.addEventListener('change', function () {
+            var opcion = tipo.selectedOptions[0];
+            var grupo = opcion && opcion.dataset.grupoTecnico;
+            grupos.forEach(function (bloque) {
+                bloque.hidden = bloque.dataset.grupo !== grupo;
+            });
+            indicacion.hidden = Boolean(grupo);
+        });
+    }
+
+    // Debajo del área se ve el edificio y el piso, para confirmar la ubicación.
+    function iniciarDetalleDeArea() {
+        var area = document.getElementById('areaId');
+        var detalle = document.querySelector('[data-detalle-area]');
+        if (!area || !detalle) {
+            return;
+        }
+        var original = detalle.textContent;
+        function actualizar() {
+            var opcion = area.selectedOptions[0];
+            detalle.textContent = opcion && opcion.dataset.detalle ? opcion.dataset.detalle : original;
+        }
+        area.addEventListener('change', actualizar);
+        actualizar();
+    }
+
+    // Con errores, el foco va al resumen para que se lea primero.
+    function enfocarResumenDeErrores() {
+        var resumen = document.getElementById('resumen-errores');
+        if (resumen) {
+            resumen.focus();
+        }
+    }
+
+    /* ---------- P-03: selección para imprimir etiquetas ---------- */
+
+    function iniciarSeleccionDeEquipos() {
+        var barra = document.getElementById('barra-seleccion');
+        if (!barra) {
+            return;
+        }
+        var casillas = Array.prototype.slice.call(document.querySelectorAll('[data-seleccion-equipo]'));
+        var todos = document.getElementById('seleccionar-todos');
+        var conteo = document.getElementById('conteo-seleccion');
+
+        function seleccionados() {
+            return casillas.filter(function (c) { return c.checked; });
+        }
+
+        function texto(n) {
+            return n === 1 ? '1 equipo seleccionado' : n + ' equipos seleccionados';
+        }
+
+        function actualizar() {
+            var n = seleccionados().length;
+            barra.hidden = n === 0;
+            conteo.textContent = texto(n);
+            if (todos) {
+                todos.checked = n > 0 && n === casillas.length;
+                todos.indeterminate = n > 0 && n < casillas.length;
+            }
+        }
+
+        casillas.forEach(function (c) { c.addEventListener('change', actualizar); });
+        if (todos) {
+            todos.addEventListener('change', function () {
+                casillas.forEach(function (c) { c.checked = todos.checked; });
+                actualizar();
+            });
+        }
+        document.getElementById('quitar-seleccion').addEventListener('click', function () {
+            casillas.forEach(function (c) { c.checked = false; });
+            actualizar();
+        });
+
+        var modal = document.getElementById('modal-etiquetas');
+        modal.addEventListener('show.bs.modal', function () {
+            var numeros = seleccionados().map(function (c) { return c.value; });
+            modal.querySelector('[data-conteo-etiquetas]').textContent =
+                numeros.length === 1 ? '1 etiqueta' : numeros.length + ' etiquetas';
+            modal.querySelector('[data-lista-etiquetas]').textContent = numeros.join(', ');
+        });
+    }
+
+    function iniciarAvisoPendiente() {
+        var modal = document.getElementById('modal-pendiente');
+        if (!modal) {
+            return;
+        }
+        modal.addEventListener('show.bs.modal', function (evento) {
+            modal.querySelector('[data-texto-pendiente]').textContent = evento.relatedTarget.dataset.accion;
+        });
+    }
+
     iniciarAvisoDeSesion();
     iniciarCampoArea();
     iniciarConfirmacion();
+    iniciarCaracteristicasPorTipo();
+    iniciarDetalleDeArea();
+    enfocarResumenDeErrores();
+    iniciarSeleccionDeEquipos();
+    iniciarAvisoPendiente();
 })();

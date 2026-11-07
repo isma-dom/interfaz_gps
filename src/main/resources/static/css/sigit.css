@@ -623,7 +623,7 @@ h1, .h1 {
 .tabla-marco {
     border: 1px solid var(--sigit-linea);
     border-radius: .25rem;
-    overflow: hidden;
+    overflow-x: auto;
 }
 
 .tabla-usuarios {
@@ -737,4 +737,400 @@ h1, .h1 {
         flex-wrap: wrap;
         justify-content: flex-start;
     }
+}
+
+/* ---------- P-03 y P-05: equipos ---------- */
+
+.acciones-titulo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.aviso-area {
+    display: flex;
+    gap: .5rem;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+
+.filtros-equipos .filtros__campo {
+    flex: 0 1 12rem;
+}
+
+.filtros .form-label {
+    margin-bottom: .25rem;
+    font-weight: 700;
+}
+
+.resumen-lista {
+    margin-bottom: .75rem;
+    color: var(--bs-secondary-color);
+}
+
+.estado-vacio h2 {
+    margin-bottom: .5rem;
+}
+
+.tabla-equipos {
+    --bs-table-bg: #fff;
+    --bs-table-color: var(--sigit-tinta);
+    --bs-table-border-color: var(--sigit-linea);
+    margin: 0;
+}
+
+.tabla-equipos th {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.tabla-equipos td,
+.tabla-equipos th {
+    padding: .75rem .625rem;
+    vertical-align: top;
+}
+
+.tabla-equipos__seleccion {
+    width: 2.75rem;
+}
+
+.tabla-equipos__seleccion .form-check-input {
+    width: 1.375rem;
+    height: 1.375rem;
+    margin: 0;
+}
+
+.tabla-equipos__inventario {
+    width: 8.5rem;
+}
+
+.tabla-equipos__numero {
+    display: block;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.tabla-equipos__serie {
+    overflow-wrap: anywhere;
+}
+
+.tabla-equipos__equipo {
+    min-width: 12rem;
+}
+
+.tabla-equipos__ubicacion {
+    min-width: 9.5rem;
+}
+
+.tabla-equipos__nombre {
+    display: block;
+    font-weight: 700;
+}
+
+.tabla-equipos__detalle {
+    display: block;
+    font-size: .875rem;
+    color: var(--bs-secondary-color);
+}
+
+.tabla-equipos__acciones {
+    text-align: right;
+}
+
+.sin-dato {
+    color: var(--bs-secondary-color);
+}
+
+/* Estados del ciclo de vida: color, icono y texto dicen lo mismo. */
+.estado-equipo {
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
+    padding: .125rem .625rem;
+    border-radius: 1rem;
+    font-size: .875rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.estado--operativo { background: #e3efe7; color: #245437; }
+.estado--reparacion { background: #f7ecd6; color: #6b4500; }
+.estado--inactivo { background: #e6eaeb; color: #3b4b50; }
+.estado--candidato { background: #f6e0da; color: #8a2815; }
+.estado--baja { background: #ececec; color: #4a4a4a; }
+.estado--revision { background: #dcedf0; color: #0f5463; }
+
+.barra-seleccion {
+    position: sticky;
+    bottom: 1rem;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-top: 1rem;
+    padding: .75rem 1rem;
+    border-radius: .25rem;
+    background: var(--sigit-ceiba);
+    color: #fff;
+    font-weight: 700;
+}
+
+.barra-seleccion[hidden] {
+    display: none;
+}
+
+.barra-seleccion__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.barra-seleccion .btn-primary {
+    --bs-btn-bg: #fff;
+    --bs-btn-color: var(--sigit-ceiba);
+    --bs-btn-border-color: #fff;
+    --bs-btn-hover-bg: #e3eef0;
+    --bs-btn-hover-color: var(--sigit-ceiba);
+    --bs-btn-hover-border-color: #e3eef0;
+}
+
+.lista-etiquetas {
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+
+.nota-prototipo {
+    margin: .75rem 0 0;
+    padding: .5rem .75rem;
+    border-left: 4px solid var(--sigit-azul-maya);
+    background: #eef4f5;
+    font-size: .9375rem;
+}
+
+/* La tabla de equipos tiene más columnas: cabe completa desde 1280 px; antes, cada fila es una ficha. */
+@media (max-width: 1279.98px) {
+    .tabla-equipos thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+
+    .tabla-equipos tr {
+        position: relative;
+        display: block;
+        padding: .875rem 1rem .875rem 1rem;
+        border-bottom: 1px solid var(--sigit-linea);
+        background: #fff;
+    }
+
+    .tabla-equipos tbody tr:last-child {
+        border-bottom: 0;
+    }
+
+    .tabla-equipos td {
+        display: grid;
+        grid-template-columns: 6.5rem minmax(0, 1fr);
+        gap: .5rem;
+        padding: .25rem 0;
+        border: 0;
+    }
+
+    .tabla-equipos td::before {
+        content: attr(data-etiqueta);
+        font-weight: 700;
+    }
+
+    .tabla-equipos td .estado-equipo {
+        justify-self: start;
+    }
+
+    .tabla-equipos td.tabla-equipos__inventario,
+    .tabla-equipos td.tabla-equipos__acciones {
+        display: block;
+    }
+
+    .tabla-equipos td.tabla-equipos__inventario {
+        width: auto;
+        padding-right: 3rem;
+    }
+
+    .tabla-equipos td.tabla-equipos__inventario .tabla-equipos__numero {
+        font-size: 1.0625rem;
+    }
+
+    .tabla-equipos td.tabla-equipos__equipo,
+    .tabla-equipos td.tabla-equipos__ubicacion {
+        min-width: 0;
+    }
+
+    .tabla-equipos td.tabla-equipos__seleccion {
+        position: absolute;
+        top: .875rem;
+        right: 1rem;
+        display: block;
+        width: auto;
+        padding: 0;
+    }
+
+    .tabla-equipos td.tabla-equipos__acciones {
+        padding-top: .5rem;
+        text-align: left;
+    }
+
+    .tabla-equipos td.tabla-equipos__inventario::before,
+    .tabla-equipos td.tabla-equipos__seleccion::before,
+    .tabla-equipos td.tabla-equipos__acciones::before {
+        content: none;
+    }
+}
+
+/* Formulario de equipo */
+.introduccion-formulario {
+    margin-bottom: 1.25rem;
+}
+
+.obligatorio {
+    color: var(--sigit-achiote);
+    font-weight: 700;
+}
+
+.formulario-equipo {
+    max-width: 52rem;
+}
+
+.seccion-formulario {
+    margin-bottom: 1.25rem;
+    padding: 1.25rem;
+    background: #fff;
+    border: 1px solid var(--sigit-linea);
+    border-radius: .25rem;
+}
+
+.seccion-formulario legend {
+    float: none;
+    width: auto;
+    margin-bottom: 1rem;
+    font-family: var(--sigit-titulos);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.seccion-formulario .form-label {
+    margin-bottom: .25rem;
+    font-weight: 700;
+}
+
+.campos-dos-columnas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.25rem;
+}
+
+.campos-dos-columnas[hidden] {
+    display: none;
+}
+
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 575.98px) {
+    .campos-dos-columnas {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.selector-corto {
+    flex: 0 0 6.5rem;
+}
+
+.casilla-grande {
+    display: flex;
+    align-items: center;
+    gap: .625rem;
+    min-height: 2.875rem;
+    padding-left: 0;
+    align-self: end;
+}
+
+.casilla-grande .form-check-input {
+    width: 1.375rem;
+    height: 1.375rem;
+    margin: 0;
+}
+
+.nota-campo {
+    display: flex;
+    gap: .625rem;
+    align-self: end;
+    padding: .75rem;
+    background: #eef4f5;
+    border-radius: .25rem;
+    font-size: .9375rem;
+}
+
+.nota-campo p {
+    margin: 0;
+}
+
+.indicacion-grupo {
+    margin: 0;
+    color: var(--bs-secondary-color);
+}
+
+.resumen-errores {
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--sigit-achiote);
+    background: #fff;
+}
+
+.resumen-errores h2 {
+    color: var(--sigit-achiote);
+}
+
+.resumen-errores ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.resumen-errores a {
+    color: var(--sigit-achiote);
+}
+
+.acciones-formulario {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.datos-fijos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .75rem 2rem;
+    max-width: 52rem;
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border: 1px solid var(--sigit-linea);
+    border-radius: .25rem;
+}
+
+.datos-fijos p {
+    flex-basis: 100%;
+    margin: 0;
+    color: var(--bs-secondary-color);
+    font-size: .9375rem;
+}
+
+.datos-fijos__etiqueta {
+    display: block;
+    font-weight: 700;
+    font-size: .875rem;
 }

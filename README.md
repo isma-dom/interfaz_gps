@@ -30,6 +30,10 @@ export SIGIT_SEED_PASSWORD='<elige una contraseña con letras y números>'
 
 Spring Boot levanta solo el MySQL de `compose.yaml`, aplica las migraciones y abre la aplicación en http://localhost:8080.
 
+## Prototipo de equipos (Tarea 1)
+
+Con el perfil `dev` existe un prototipo navegable de las pantallas P-03 (listado) y P-05 (registro y edición) de equipos, con 25 equipos de ejemplo en memoria: http://localhost:8080/prototipos/equipos. Registrar y editar es solo del Administrador; Consulta ve únicamente su área. Los equipos se pierden al reiniciar: guardarlos en MySQL es una tarea posterior.
+
 ## Usuarios de prueba
 
 El perfil `dev` crea tres áreas de ejemplo y un usuario por rol. Fuera de ese perfil no se crean.

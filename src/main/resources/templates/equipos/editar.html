@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/pagina :: pagina(|Editar equipo ${existente.numInventario}|, ~{}, ~{::#cuerpo-pagina})}">
+<body>
+<form id="cuerpo-pagina" method="post" th:action="@{/prototipos/equipos/{id}(id=${existente.id})}" novalidate>
+    <div class="datos-fijos">
+        <div>
+            <span class="datos-fijos__etiqueta">Estado</span>
+            <span class="estado-equipo" th:classappend="|estado--${existente.estado.clase}|">
+                <i class="bi" th:classappend="|bi-${existente.estado.icono}|" aria-hidden="true"></i>
+                <span th:text="${existente.estado.etiqueta}">Operativo</span>
+            </span>
+        </div>
+        <div>
+            <span class="datos-fijos__etiqueta">Responsable</span>
+            <span th:text="${existente.responsable ?: 'Sin resguardo'}">Sin resguardo</span>
+        </div>
+        <p>El estado y el responsable cambian con un movimiento o un resguardo, no desde aquí.</p>
+    </div>
+    <div th:replace="~{equipos/formulario :: campos('Guardar cambios', false)}"></div>
+</form>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/pagina :: pagina('Registrar equipo', ~{}, ~{::#cuerpo-pagina})}">
+<body>
+<form id="cuerpo-pagina" method="post" th:action="@{/prototipos/equipos}" novalidate>
+    <p class="texto-acotado introduccion-formulario">
+        Los campos con <span class="obligatorio">*</span> son obligatorios. El equipo queda como Operativo y el sistema
+        genera su código QR al guardar.
+    </p>
+    <div th:replace="~{equipos/formulario :: campos('Registrar equipo', true)}"></div>
+</form>
+</body>
+</html>

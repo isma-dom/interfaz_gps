@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/* P-05: campos del alta y la edición de equipos, en cinco secciones (AD 2.2.2). */-->
+<div th:fragment="campos(textoBoton, esAlta)" class="formulario-equipo" th:object="${equipo}">
+
+    <div class="resumen-errores" role="alert" tabindex="-1" id="resumen-errores" th:if="${#fields.hasErrors('*')}">
+        <h2 class="h5" th:text="${#fields.errors('*').size() == 1} ? 'Revisa 1 campo' : |Revisa ${#fields.errors('*').size()} campos|">Revisa los campos</h2>
+        <!--/* En el orden en que aparecen los campos, con un enlace a cada uno. */-->
+        <ul>
+            <th:block th:each="campo : ${ {'numInventario', 'numSerie', 'tipoId', 'marcaId', 'modelo', 'areaId', 'procesador',
+                                           'memoriaGb', 'almacenamientoGb', 'sistemaOperativo', 'puertos', 'direccionIp',
+                                           'tamanoPulgadas', 'resolucion', 'capacidadVa', 'autonomiaMinutos',
+                                           'fechaAdquisicion', 'costo', 'observaciones'} }">
+                <li th:each="mensaje : ${#fields.errors(campo)}">
+                    <a th:href="|#${campo}|" th:text="${mensaje}">Error</a>
+                </li>
+            </th:block>
+        </ul>
+    </div>
+
+    <fieldset class="seccion-formulario">
+        <legend>Identificación</legend>
+        <div class="campos-dos-columnas">
+            <div>
+                <label class="form-label" for="numInventario">Número de inventario <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input class="form-control" type="text" th:field="*{numInventario}" maxlength="30" required autocomplete="off"
+                       autocapitalize="characters" spellcheck="false" th:errorclass="is-invalid"
+                       aria-describedby="numInventario-ayuda" th:autofocus="${esAlta}">
+                <div class="form-text" id="numInventario-ayuda">El número de la etiqueta patrimonial, por ejemplo BBJ-0001.</div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('numInventario')}" th:errors="*{numInventario}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="numSerie">Número de serie <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input class="form-control" type="text" th:field="*{numSerie}" maxlength="60" required autocomplete="off"
+                       autocapitalize="characters" spellcheck="false" th:errorclass="is-invalid"
+                       aria-describedby="numSerie-ayuda">
+                <div class="form-text" id="numSerie-ayuda">Viene en la etiqueta del fabricante.</div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('numSerie')}" th:errors="*{numSerie}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="tipoId">Tipo de equipo <span class="obligatorio" aria-hidden="true">*</span></label>
+                <select class="form-select" th:field="*{tipoId}" required th:errorclass="is-invalid" data-tipo-equipo>
+                    <option value="">Elige un tipo</option>
+                    <option th:each="t : ${tipos}" th:value="${t.id}" th:text="${t.nombre}" th:data-grupo-tecnico="${t.grupo}">Tipo</option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('tipoId')}" th:errors="*{tipoId}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="marcaId">Marca <span class="obligatorio" aria-hidden="true">*</span></label>
+                <select class="form-select" th:field="*{marcaId}" required th:errorclass="is-invalid">
+                    <option value="">Elige una marca</option>
+                    <option th:each="m : ${marcas}" th:value="${m.id}" th:text="${m.nombre}">Marca</option>
+                </select>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('marcaId')}" th:errors="*{marcaId}">Error</div>
+            </div>
+            <div class="campo-completo">
+                <label class="form-label" for="modelo">Modelo <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input class="form-control" type="text" th:field="*{modelo}" maxlength="80" required autocomplete="off"
+                       th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('modelo')}" th:errors="*{modelo}">Error</div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="seccion-formulario">
+        <legend>Ubicación</legend>
+        <div class="campos-dos-columnas">
+            <div>
+                <label class="form-label" for="areaId">Área <span class="obligatorio" aria-hidden="true">*</span></label>
+                <select class="form-select" th:field="*{areaId}" required th:errorclass="is-invalid" aria-describedby="areaId-ayuda">
+                    <option value="">Elige un área</option>
+                    <option th:each="a : ${areas}" th:value="${a.id}" th:text="${a.nombre}"
+                            th:data-detalle="${a.detalle()}">Área</option>
+                </select>
+                <div class="form-text" id="areaId-ayuda" data-detalle-area>Dónde está físicamente el equipo.</div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('areaId')}" th:errors="*{areaId}">Error</div>
+            </div>
+            <div class="nota-campo">
+                <i class="bi bi-person-badge" aria-hidden="true"></i>
+                <p>El responsable no se captura aquí: se asigna con un resguardo, que genera su formato en PDF.</p>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="seccion-formulario">
+        <legend>Características técnicas</legend>
+        <p class="indicacion-grupo" data-sin-tipo th:hidden="${grupoActual != null}">Elige el tipo de equipo para ver sus características.</p>
+
+        <div class="campos-dos-columnas" data-grupo="COMPUTO" th:hidden="${grupoActual != 'COMPUTO'}">
+            <div>
+                <label class="form-label" for="procesador">Procesador</label>
+                <input class="form-control" type="text" th:field="*{procesador}" maxlength="80" placeholder="Ej. Core i5-12400" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('procesador')}" th:errors="*{procesador}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="memoriaGb">Memoria RAM (GB)</label>
+                <input class="form-control" type="number" th:field="*{memoriaGb}" min="1" max="1024" inputmode="numeric" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('memoriaGb')}" th:errors="*{memoriaGb}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="almacenamientoGb">Almacenamiento (GB)</label>
+                <div class="input-group has-validation">
+                    <input class="form-control" type="number" th:field="*{almacenamientoGb}" min="1" inputmode="numeric" th:errorclass="is-invalid">
+                    <label class="visually-hidden" for="tipoAlmacenamiento">Tipo de almacenamiento</label>
+                    <select class="form-select selector-corto" th:field="*{tipoAlmacenamiento}">
+                        <option value="">Tipo</option>
+                        <option value="SSD">SSD</option>
+                        <option value="HDD">HDD</option>
+                    </select>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('almacenamientoGb')}" th:errors="*{almacenamientoGb}">Error</div>
+                </div>
+            </div>
+            <div>
+                <label class="form-label" for="sistemaOperativo">Sistema operativo</label>
+                <input class="form-control" type="text" th:field="*{sistemaOperativo}" maxlength="60" list="sistemas-operativos"
+                       aria-describedby="sistemaOperativo-ayuda" th:errorclass="is-invalid">
+                <datalist id="sistemas-operativos">
+                    <option value="Windows 11"></option>
+                    <option value="Windows 10"></option>
+                    <option value="Windows 7"></option>
+                    <option value="Ubuntu 24.04"></option>
+                    <option value="macOS"></option>
+                </datalist>
+                <div class="form-text" id="sistemaOperativo-ayuda">Se usa para detectar equipos sin soporte (obsolescencia).</div>
+            </div>
+        </div>
+
+        <div class="campos-dos-columnas" data-grupo="IMPRESION" th:hidden="${grupoActual != 'IMPRESION'}">
+            <div>
+                <label class="form-label" for="tecnologiaImpresion">Tecnología de impresión</label>
+                <select class="form-select" th:field="*{tecnologiaImpresion}">
+                    <option value="">Elige una opción</option>
+                    <option value="Láser">Láser</option>
+                    <option value="Inyección de tinta">Inyección de tinta</option>
+                    <option value="Térmica">Térmica</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label" for="conexion">Conexión</label>
+                <select class="form-select" th:field="*{conexion}">
+                    <option value="">Elige una opción</option>
+                    <option value="USB">USB</option>
+                    <option value="Red">Red</option>
+                    <option value="Wi-Fi">Wi-Fi</option>
+                </select>
+            </div>
+            <div class="form-check casilla-grande">
+                <input class="form-check-input" type="checkbox" th:field="*{impresionColor}">
+                <label class="form-check-label" th:for="${#ids.prev('impresionColor')}">Imprime a color</label>
+            </div>
+        </div>
+
+        <div class="campos-dos-columnas" data-grupo="RED" th:hidden="${grupoActual != 'RED'}">
+            <div>
+                <label class="form-label" for="puertos">Número de puertos</label>
+                <input class="form-control" type="number" th:field="*{puertos}" min="1" max="128" inputmode="numeric" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('puertos')}" th:errors="*{puertos}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="direccionIp">Dirección IP</label>
+                <input class="form-control" type="text" th:field="*{direccionIp}" maxlength="45" placeholder="Ej. 192.168.10.2" inputmode="decimal">
+            </div>
+            <div class="form-check casilla-grande">
+                <input class="form-check-input" type="checkbox" th:field="*{administrable}">
+                <label class="form-check-label" th:for="${#ids.prev('administrable')}">Es administrable</label>
+            </div>
+        </div>
+
+        <div class="campos-dos-columnas" data-grupo="VIDEO" th:hidden="${grupoActual != 'VIDEO'}">
+            <div>
+                <label class="form-label" for="tamanoPulgadas">Tamaño (pulgadas)</label>
+                <input class="form-control" type="number" th:field="*{tamanoPulgadas}" min="1" max="200" inputmode="numeric" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('tamanoPulgadas')}" th:errors="*{tamanoPulgadas}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="resolucion">Resolución</label>
+                <input class="form-control" type="text" th:field="*{resolucion}" maxlength="20" placeholder="Ej. 1920 × 1080">
+            </div>
+        </div>
+
+        <div class="campos-dos-columnas" data-grupo="ENERGIA" th:hidden="${grupoActual != 'ENERGIA'}">
+            <div>
+                <label class="form-label" for="capacidadVa">Capacidad (VA)</label>
+                <input class="form-control" type="number" th:field="*{capacidadVa}" min="1" inputmode="numeric" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('capacidadVa')}" th:errors="*{capacidadVa}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="autonomiaMinutos">Autonomía (minutos)</label>
+                <input class="form-control" type="number" th:field="*{autonomiaMinutos}" min="1" inputmode="numeric" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('autonomiaMinutos')}" th:errors="*{autonomiaMinutos}">Error</div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="seccion-formulario">
+        <legend>Adquisición</legend>
+        <div class="campos-dos-columnas">
+            <div>
+                <label class="form-label" for="fechaAdquisicion">Fecha de adquisición</label>
+                <input class="form-control" type="date" th:field="*{fechaAdquisicion}" th:max="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                       th:errorclass="is-invalid" aria-describedby="fechaAdquisicion-ayuda">
+                <div class="form-text" id="fechaAdquisicion-ayuda">Con ella se calcula la antigüedad del equipo.</div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('fechaAdquisicion')}" th:errors="*{fechaAdquisicion}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="costo">Costo (pesos)</label>
+                <div class="input-group has-validation">
+                    <span class="input-group-text" aria-hidden="true">$</span>
+                    <input class="form-control" type="number" th:field="*{costo}" min="0" step="0.01" inputmode="decimal" th:errorclass="is-invalid">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('costo')}" th:errors="*{costo}">Error</div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="seccion-formulario">
+        <legend>Observaciones</legend>
+        <label class="form-label visually-hidden" for="observaciones">Observaciones</label>
+        <textarea class="form-control" th:field="*{observaciones}" rows="3" maxlength="1000"
+                  placeholder="Por ejemplo: le falta el cable de corriente." th:errorclass="is-invalid"></textarea>
+        <div class="invalid-feedback" th:if="${#fields.hasErrors('observaciones')}" th:errors="*{observaciones}">Error</div>
+    </fieldset>
+
+    <div class="acciones-formulario">
+        <button class="btn btn-primary" type="submit" th:text="${textoBoton}">Guardar</button>
+        <button class="btn btn-outline-primary" type="submit" name="otro" value="1" th:if="${esAlta}">Registrar y agregar otro</button>
+        <a class="btn btn-outline-secondary" th:href="@{/prototipos/equipos}">Cancelar</a>
+    </div>
+</div>
+</body>
+</html>

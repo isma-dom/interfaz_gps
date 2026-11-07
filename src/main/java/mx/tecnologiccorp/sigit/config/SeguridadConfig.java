@@ -2,6 +2,7 @@ package mx.tecnologiccorp.sigit.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -18,6 +19,7 @@ import mx.tecnologiccorp.sigit.seguridad.ManejadorExitoLogin;
 import mx.tecnologiccorp.sigit.seguridad.ManejadorFalloLogin;
 import mx.tecnologiccorp.sigit.seguridad.Pantalla;
 import mx.tecnologiccorp.sigit.seguridad.Peticiones;
+import mx.tecnologiccorp.sigit.seguridad.Rol;
 import mx.tecnologiccorp.sigit.seguridad.UsuarioRepository;
 
 /**
@@ -40,6 +42,10 @@ public class SeguridadConfig {
 		http.authorizeHttpRequests(reglas -> {
 				reglas.requestMatchers("/login", "/error", "/css/**", "/js/**", "/fuentes/**", "/webjars/**")
 					.permitAll();
+				// Prototipo de la Tarea 1 (solo perfil dev): registrar y editar equipos es del Administrador.
+				reglas.requestMatchers("/prototipos/equipos/nuevo", "/prototipos/equipos/*/editar")
+					.hasRole(Rol.ADMINISTRADOR);
+				reglas.requestMatchers(HttpMethod.POST, "/prototipos/equipos/**").hasRole(Rol.ADMINISTRADOR);
 				for (Pantalla pantalla : Pantalla.values()) {
 					reglas.requestMatchers(pantalla.getRuta(), pantalla.getRuta() + "/**")
 						.hasAnyRole(pantalla.getRoles().toArray(String[]::new));

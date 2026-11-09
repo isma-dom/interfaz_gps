@@ -46,6 +46,8 @@ public class SeguridadConfig {
 				// de todos los roles.
 				reglas.requestMatchers("/equipos/nuevo", "/equipos/*/editar", "/equipos/*/baja")
 					.hasRole(Rol.ADMINISTRADOR);
+				// Imprimir etiquetas QR también es del Administrador (RF-05); ver y descargar el código, de todos.
+				reglas.requestMatchers("/equipos/etiquetas", "/equipos/*/etiqueta.pdf").hasRole(Rol.ADMINISTRADOR);
 				reglas.requestMatchers(HttpMethod.POST, "/equipos", "/equipos/**").hasRole(Rol.ADMINISTRADOR);
 				// Prototipo de la Tarea 1 (solo perfil dev): registrar y editar equipos es del Administrador.
 				reglas.requestMatchers("/prototipos/equipos/nuevo", "/prototipos/equipos/*/editar")

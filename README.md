@@ -48,6 +48,14 @@ El Administrador registra equipos en Equipos → Nuevo equipo (http://localhost:
 - **Después**: el equipo deja de aparecer en el listado de activos; se consulta con el filtro «Dados de baja», su ficha conserva todos los datos con su historial y ya no admite cambios.
 - **Candidatos a baja (RN-06)**: `ClasificadorDeObsolescencia` corre al arrancar y cada día a las 2:00. Pasa a Candidato a baja los equipos Operativos o Inactivos con 5 años o más de antigüedad o con un sistema operativo sin soporte (`sigit.obsolescencia.*` en `application.properties`).
 
+## Códigos QR (Tarea 5)
+
+- **Qué lleva**: solo la URL `<servidor>/e/<qr_uuid>` (RN-05, C-26). El `qr_uuid` se asigna al registrar el equipo, es único en la base de datos y no cambia al editarlo. Define `SIGIT_URL_PUBLICA` (por ejemplo `https://sigit.bbj.gob.mx`) para que los códigos lleven la dirección pública; sin ella se usa la dirección con la que se pidió la página.
+- **Escaneo**: la cámara del celular abre `/e/<qr_uuid>`; sin sesión, SIGIT pide iniciarla y luego abre la ficha del equipo. También responde `/equipos/qr/<qr_uuid>`. Consulta solo abre los de su área.
+- **Ver y descargar**: la ficha muestra el código y lo descarga en PNG o SVG (`/equipos/{id}/qr.png`, `/equipos/{id}/qr.svg`).
+- **Imprimir** (solo Administrador): etiquetas de 5 × 3 cm en PDF tamaño carta, 24 por hoja, con el código, el número de inventario y el área. Una desde la ficha (`/equipos/{id}/etiqueta.pdf`) o varias seleccionándolas en el listado (`/equipos/etiquetas?id=…`). Los equipos dados de baja ya no llevan etiqueta.
+- Librerías: ZXing 3.5.4 (genera el código) y OpenPDF 3.0.5 (el PDF).
+
 ## Prototipo de equipos (Tarea 1)
 
 Con el perfil `dev` existe un prototipo navegable de las pantallas P-03 (listado) y P-05 (registro y edición) de equipos, con 26 equipos de ejemplo en memoria: http://localhost:8080/prototipos/equipos. Registrar, editar y dar de baja es solo del Administrador; Consulta ve únicamente su área. Los equipos se pierden al reiniciar: guardarlos en MySQL es una tarea posterior.

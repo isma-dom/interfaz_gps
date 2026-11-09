@@ -20,6 +20,8 @@ public interface EquipoRepository extends JpaRepository<Equipo, Long>, JpaSpecif
 
 	Optional<Equipo> findByNumInventario(String numInventario);
 
+	Optional<Equipo> findByQrUuid(String qrUuid);
+
 	List<Equipo> findByEstadoIn(Collection<EstadoEquipo> estados);
 
 	long countByEstado(EstadoEquipo estado);

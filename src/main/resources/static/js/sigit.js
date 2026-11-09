@@ -252,7 +252,11 @@
             actualizar();
         });
 
+        // El prototipo confirma en una ventana; el listado real abre el PDF directamente.
         var modal = document.getElementById('modal-etiquetas');
+        if (!modal) {
+            return;
+        }
         modal.addEventListener('show.bs.modal', function () {
             var numeros = seleccionados().map(function (c) { return c.value; });
             modal.querySelector('[data-conteo-etiquetas]').textContent =

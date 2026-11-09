@@ -6,7 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /** Valores configurables de SIGIT (application.properties, prefijo sigit). */
 @ConfigurationProperties("sigit")
-public record PropiedadesSigit(Bloqueo bloqueo, Sesion sesion, Obsolescencia obsolescencia, String seedPassword) {
+public record PropiedadesSigit(Bloqueo bloqueo, Sesion sesion, Obsolescencia obsolescencia, String seedPassword,
+		String urlPublica) {
 
 	/** Bloqueo temporal tras varios intentos fallidos con la misma cuenta (C-01). */
 	public record Bloqueo(int intentos, int minutos) {

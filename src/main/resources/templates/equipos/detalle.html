@@ -114,6 +114,38 @@
         </footer>
     </article>
 
+    <!--/* Tarea 5: el código QR del equipo (RN-05: solo la URL con su identificador). */-->
+    <section class="tarjeta-formulario codigo-qr" aria-labelledby="titulo-qr">
+        <h2 class="titulo-seccion" id="titulo-qr"><i class="bi bi-qr-code" aria-hidden="true"></i> Código QR</h2>
+        <div class="codigo-qr__cuerpo">
+            <img class="codigo-qr__imagen" th:src="@{/equipos/{id}/qr.svg(id=${e.id})}"
+                 th:alt="|Código QR del equipo ${e.numInventario}|" width="184" height="184">
+            <div class="codigo-qr__texto">
+                <p>Al escanearlo con la cámara del celular abre esta ficha. Para verla hay que iniciar sesión:
+                    el código no lleva datos del equipo, solo su identificador.</p>
+                <dl class="codigo-qr__datos">
+                    <div><dt>Contenido del código</dt><dd><code th:text="${qrContenido}">https://servidor/e/uuid</code></dd></div>
+                    <div><dt>Identificador único</dt><dd><code th:text="${e.qrUuid}">uuid</code></dd></div>
+                </dl>
+                <div class="codigo-qr__acciones">
+                    <a class="btn btn-outline-secondary" th:href="@{/equipos/{id}/qr.png(id=${e.id},descargar=1)}">
+                        <i class="bi bi-download" aria-hidden="true"></i> Descargar PNG
+                    </a>
+                    <a class="btn btn-outline-secondary" th:href="@{/equipos/{id}/qr.svg(id=${e.id},descargar=1)}">
+                        <i class="bi bi-download" aria-hidden="true"></i> Descargar SVG
+                    </a>
+                    <a class="btn btn-primary" th:if="${puedeImprimir}" target="_blank" rel="noopener"
+                       th:href="@{/equipos/{id}/etiqueta.pdf(id=${e.id})}">
+                        <i class="bi bi-printer" aria-hidden="true"></i> Imprimir etiqueta
+                    </a>
+                </div>
+                <p class="codigo-qr__nota" th:if="${puedeImprimir}">La etiqueta mide 5 × 3 cm y sale en la primera posición de una hoja carta.
+                    Para varias, selecciónalas en el listado.</p>
+                <p class="codigo-qr__nota" th:if="${e.estado.name() == 'BAJA'}">Equipo dado de baja: su código sigue abriendo esta ficha, pero ya no se imprime etiqueta.</p>
+            </div>
+        </div>
+    </section>
+
     <!--/* Historial de movimientos (tabla movimientos): alta, cambios de estado y baja. */-->
     <section class="tarjeta-formulario historial-equipo" th:unless="${historial.isEmpty()}" aria-labelledby="titulo-historial">
         <h2 class="titulo-seccion" id="titulo-historial">

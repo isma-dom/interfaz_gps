@@ -23,7 +23,11 @@
         </div>
         <div><dt>Registrado</dt><dd th:text="${#temporals.format(registrado.registrado, 'dd/MM/yyyy HH:mm')}">Fecha</dd></div>
     </dl>
-    <p class="mb-0">Su código QR quedó asignado; la etiqueta se imprime desde el listado cuando esté disponible.</p>
+    <p class="mb-0">
+        <i class="bi bi-qr-code" aria-hidden="true"></i>
+        Su código QR se generó al guardar.
+        <a th:href="@{/equipos/{id}(id=${registrado.id})}">Ver su ficha y su código QR</a>
+    </p>
 </div>
 </body>
 </html>

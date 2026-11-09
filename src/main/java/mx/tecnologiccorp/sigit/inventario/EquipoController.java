@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import mx.tecnologiccorp.sigit.catalogos.Area;
+import mx.tecnologiccorp.sigit.qr.QrService;
 import mx.tecnologiccorp.sigit.seguridad.Pantalla;
 import mx.tecnologiccorp.sigit.seguridad.Rol;
-import mx.tecnologiccorp.sigit.seguridad.UsuarioRepository;
 import mx.tecnologiccorp.sigit.seguridad.UsuarioSesion;
 
 /**
@@ -39,11 +39,14 @@ public class EquipoController {
 
 	private final EquipoService servicio;
 
-	private final UsuarioRepository usuarios;
+	private final AccesoAEquipos acceso;
 
-	public EquipoController(EquipoService servicio, UsuarioRepository usuarios) {
+	private final QrService qr;
+
+	public EquipoController(EquipoService servicio, AccesoAEquipos acceso, QrService qr) {
 		this.servicio = servicio;
-		this.usuarios = usuarios;
+		this.acceso = acceso;
+		this.qr = qr;
 	}
 
 	@ModelAttribute
@@ -95,6 +98,9 @@ public class EquipoController {
 		modelo.addAttribute("puedeEditar", administrador && equipo.getEstado() != EstadoEquipo.BAJA);
 		modelo.addAttribute("puedeDarDeBaja", administrador && equipo.getEstado().admiteBaja());
 		modelo.addAttribute("historial", servicio.historial(id));
+		// Tarea 5: lo que lleva su código QR y si se puede imprimir su etiqueta.
+		modelo.addAttribute("qrContenido", qr.contenido(equipo));
+		modelo.addAttribute("puedeImprimir", administrador && equipo.getEstado() != EstadoEquipo.BAJA);
 		if (equipo.getEstado() == EstadoEquipo.BAJA) {
 			modelo.addAttribute("baja", servicio.movimientoDeBaja(id).orElse(null));
 		}
@@ -235,20 +241,12 @@ public class EquipoController {
 		});
 	}
 
-	/** Consulta solo ve los equipos de su área (C-04); fuera de ella, el equipo «no existe». */
 	private Equipo visible(Long id, UsuarioSesion usuario) {
-		Equipo equipo = servicio.consultar(id).orElseThrow(() -> new EquipoNoEncontrado(id));
-		if (usuario.tieneRol(Rol.CONSULTA)) {
-			Area area = areaDe(usuario);
-			if (area == null || !area.getId().equals(equipo.getArea().getId())) {
-				throw new EquipoNoEncontrado(id);
-			}
-		}
-		return equipo;
+		return acceso.visible(id, usuario);
 	}
 
 	private Area areaDe(UsuarioSesion usuario) {
-		return usuarios.findById(usuario.id()).map(u -> u.getArea()).orElse(null);
+		return acceso.areaDe(usuario);
 	}
 
 	private String formulario(Model modelo, EquipoForm formulario, String vista) {

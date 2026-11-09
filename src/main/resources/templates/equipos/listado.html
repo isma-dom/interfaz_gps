@@ -97,6 +97,10 @@
                 <caption class="visually-hidden">Equipos del inventario</caption>
                 <thead>
                 <tr>
+                    <th scope="col" class="tabla-equipos__seleccion" th:if="${puedeEditar}">
+                        <input class="form-check-input" type="checkbox" id="seleccionar-todos"
+                               aria-label="Seleccionar todos los equipos activos de esta página">
+                    </th>
                     <th scope="col">ID / Serie</th>
                     <th scope="col">Nombre del equipo</th>
                     <th scope="col">Tipo</th>
@@ -108,6 +112,12 @@
                 </thead>
                 <tbody>
                 <tr th:each="e : ${equipos}">
+                    <!--/* Tarea 5: selección para imprimir etiquetas QR; un equipo dado de baja ya no lleva etiqueta. */-->
+                    <td class="tabla-equipos__seleccion" th:if="${puedeEditar}">
+                        <input class="form-check-input" type="checkbox" name="id" form="form-etiquetas" data-seleccion-equipo
+                               th:if="${e.estado.name() != 'BAJA'}" th:value="${e.id}"
+                               th:aria-label="|Seleccionar ${e.numInventario} para imprimir su etiqueta|">
+                    </td>
                     <td class="tabla-equipos__inventario">
                         <span class="tabla-equipos__numero" th:text="${e.numInventario}">BBJ-0001</span>
                         <span class="tabla-equipos__detalle" th:text="${e.numSerie}">Serie</span>
@@ -175,6 +185,18 @@
             </ul>
         </nav>
     </th:block>
+
+    <!--/* Barra que aparece al seleccionar equipos: el PDF de etiquetas se abre en otra pestaña (RF-05). */-->
+    <form id="form-etiquetas" method="get" th:action="@{/equipos/etiquetas}" target="_blank" th:if="${puedeEditar}"></form>
+    <div class="barra-seleccion" id="barra-seleccion" hidden th:if="${puedeEditar}" aria-live="polite">
+        <span id="conteo-seleccion">0 equipos seleccionados</span>
+        <div class="barra-seleccion__acciones">
+            <button class="btn btn-primary" type="submit" form="form-etiquetas">
+                <i class="bi bi-qr-code" aria-hidden="true"></i> Imprimir etiquetas QR
+            </button>
+            <button class="btn btn-outline-light" type="button" id="quitar-seleccion">Quitar selección</button>
+        </div>
+    </div>
 </section>
 </body>
 </html>

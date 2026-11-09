@@ -53,7 +53,7 @@ class PrototipoEquiposTest extends PruebaIntegracion {
 	void elAdministradorVeElListadoConAccionesDeEdicion() throws Exception {
 		mvc.perform(get("/prototipos/equipos").with(como(crearUsuario(Rol.ADMINISTRADOR))))
 			.andExpect(status().isOk())
-			.andExpect(content().string(containsString("Registrar equipo")))
+			.andExpect(content().string(containsString("Nuevo equipo")))
 			.andExpect(content().string(containsString("data-seleccion-equipo")))
 			.andExpect(content().string(containsString("Mostrando 1 a 15 de")));
 	}
@@ -106,7 +106,7 @@ class PrototipoEquiposTest extends PruebaIntegracion {
 
 		mvc.perform(get("/prototipos/equipos").with(como(ejecutivo)))
 			.andExpect(status().isOk())
-			.andExpect(content().string(not(containsString("Registrar equipo"))));
+			.andExpect(content().string(not(containsString("Nuevo equipo"))));
 		mvc.perform(get("/prototipos/equipos/1/editar").with(como(ejecutivo))).andExpect(status().isForbidden());
 	}
 

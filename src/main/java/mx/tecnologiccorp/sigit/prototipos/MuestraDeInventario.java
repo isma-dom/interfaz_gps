@@ -117,7 +117,21 @@ public class MuestraDeInventario {
 		return equipos.size();
 	}
 
+	/** Orden del listado: por número de inventario (por omisión), por nombre o los más recientes primero. */
+	public static Comparator<Equipo> orden(String orden) {
+		return switch (orden == null ? "" : orden) {
+			case "nombre" -> Comparator.comparing(Equipo::nombre, String.CASE_INSENSITIVE_ORDER);
+			case "recientes" -> Comparator.comparing(Equipo::id).reversed();
+			default -> Comparator.comparing(Equipo::numInventario);
+		};
+	}
+
 	public Page<Equipo> buscar(String texto, Long areaId, Long tipoId, EstadoEquipo estado, int pagina) {
+		return buscar(texto, areaId, tipoId, estado, null, pagina);
+	}
+
+	public Page<Equipo> buscar(String texto, Long areaId, Long tipoId, EstadoEquipo estado, String orden,
+			int pagina) {
 		String buscado = texto == null ? "" : texto.trim().toLowerCase(Locale.ROOT);
 		List<Equipo> encontrados = equipos.stream()
 			.filter(e -> buscado.isEmpty() || Stream
@@ -127,7 +141,7 @@ public class MuestraDeInventario {
 			.filter(e -> areaId == null || e.area().id().equals(areaId))
 			.filter(e -> tipoId == null || e.tipo().id().equals(tipoId))
 			.filter(e -> estado == null || e.estado() == estado)
-			.sorted(Comparator.comparing(Equipo::numInventario))
+			.sorted(orden(orden))
 			.toList();
 		int desde = Math.min(pagina * POR_PAGINA, encontrados.size());
 		int hasta = Math.min(desde + POR_PAGINA, encontrados.size());

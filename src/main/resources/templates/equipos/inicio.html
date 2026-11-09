@@ -2,8 +2,8 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{fragmentos/pagina :: pagina('Equipos', ~{::#acciones}, ~{::#cuerpo-pagina})}">
 <body>
-<a id="acciones" class="btn btn-primary" th:href="@{/equipos/nuevo}" th:if="${puedeRegistrar}">
-    <i class="bi bi-plus-lg" aria-hidden="true"></i> Registrar equipo
+<a id="acciones" class="btn btn-primary btn-nuevo" th:href="@{/equipos/nuevo}" th:if="${puedeRegistrar}">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo equipo
 </a>
 
 <section id="cuerpo-pagina">

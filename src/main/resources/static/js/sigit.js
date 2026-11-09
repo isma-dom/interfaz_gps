@@ -279,4 +279,9 @@
     enfocarResumenDeErrores();
     iniciarSeleccionDeEquipos();
     iniciarAvisoPendiente();
+
+    // Desde el ícono «Dar de baja» del listado: abre la ventana de baja al llegar a la edición.
+    if (window.location.hash === '#dar-de-baja' && document.getElementById('modal-baja')) {
+        new bootstrap.Modal(document.getElementById('modal-baja')).show();
+    }
 })();

@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragmentos/pagina :: pagina('Registrar equipo', ~{}, ~{::#cuerpo-pagina})}">
+      th:replace="~{fragmentos/pagina :: pagina('Registrar nuevo equipo', ~{::#cerrar}, ~{::#cuerpo-pagina})}">
 <body>
+<a id="cerrar" class="tarjeta-formulario__cerrar" th:href="@{/prototipos/equipos}" aria-label="Cerrar sin guardar">
+    <i class="bi bi-x-lg" aria-hidden="true"></i>
+</a>
 <form id="cuerpo-pagina" method="post" th:action="@{/prototipos/equipos}" novalidate>
-    <p class="texto-acotado introduccion-formulario">
-        Los campos con <span class="obligatorio">*</span> son obligatorios. El equipo queda como Operativo y el sistema
-        genera su código QR al guardar.
-    </p>
-    <div th:replace="~{equipos/formulario :: campos('Registrar equipo', true, '/prototipos/equipos')}"></div>
+    <div class="tarjeta-formulario">
+        <p class="introduccion-formulario">
+            Los campos con <span class="obligatorio">*</span> son obligatorios. El sistema le asigna su código QR al guardar.
+        </p>
+        <div th:replace="~{equipos/formulario :: campos('Guardar equipo', true, '/prototipos/equipos')}"></div>
+    </div>
 </form>
 </body>
 </html>

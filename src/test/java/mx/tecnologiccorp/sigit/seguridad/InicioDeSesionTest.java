@@ -133,13 +133,16 @@ class InicioDeSesionTest extends PruebaIntegracion {
 			.andExpect(unauthenticated());
 	}
 
+	/** Sin «Recuérdame» (la sesión expira a los 30 minutos) ni recuperación por correo (fuera de alcance). */
 	@Test
-	void noExisteRecuerdameNiRecuperacionDeContrasena() throws Exception {
+	void noExisteRecuerdameYLaContrasenaLaReasignaSoporte() throws Exception {
 		mvc.perform(get("/login"))
 			.andExpect(status().isOk())
-			.andExpect(content().string(containsString("Inicia sesión")))
+			.andExpect(content().string(containsString("Inicia sesión para acceder al sistema")))
 			.andExpect(content().string(not(containsString("Recuérdame"))))
-			.andExpect(content().string(not(containsString("Olvidaste"))));
+			.andExpect(content().string(not(containsString("Recordarme"))))
+			.andExpect(content().string(containsString("Pide a Soporte Técnico que te asigne una nueva")));
+		mvc.perform(get("/recuperar-contrasena")).andExpect(redirectedUrl("/login"));
 	}
 
 	@Test

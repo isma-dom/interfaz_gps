@@ -248,7 +248,7 @@ class AltaDeEquiposTest extends PruebaIntegracion {
 				.param("areaId", sala.getId().toString())).andExpect(status().isForbidden());
 			mvc.perform(get("/equipos").with(como(usuario)))
 				.andExpect(status().isOk())
-				.andExpect(content().string(not(containsString("Registrar equipo"))));
+				.andExpect(content().string(not(containsString("Nuevo equipo"))));
 		}
 
 		assertThat(equipos.count()).isZero();

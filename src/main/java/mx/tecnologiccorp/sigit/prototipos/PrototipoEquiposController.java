@@ -56,6 +56,7 @@ public class PrototipoEquiposController {
 			@RequestParam(name = "area", required = false) Long areaId,
 			@RequestParam(name = "tipo", required = false) Long tipoId,
 			@RequestParam(name = "estado", required = false) EstadoEquipo estado,
+			@RequestParam(name = "orden", required = false) String orden,
 			@RequestParam(name = "pagina", defaultValue = "1") int pagina,
 			@AuthenticationPrincipal UsuarioSesion usuario, Model modelo) {
 		// Consulta solo ve su área (C-04): el filtro queda fijo.
@@ -68,7 +69,8 @@ public class PrototipoEquiposController {
 			areaId = areaFija == null ? -1L : areaFija.id();
 		}
 
-		modelo.addAttribute("equipos", inventario.buscar(q, areaId, tipoId, estado, Math.max(pagina, 1) - 1));
+		modelo.addAttribute("equipos", inventario.buscar(q, areaId, tipoId, estado, orden, Math.max(pagina, 1) - 1));
+		modelo.addAttribute("orden", orden);
 		modelo.addAttribute("totalInventario", inventario.total());
 		modelo.addAttribute("q", q == null ? "" : q.trim());
 		modelo.addAttribute("areaId", areaId);

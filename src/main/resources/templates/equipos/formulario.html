@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <body>
-<!--/* P-05: campos del alta y la edición de equipos, en cinco secciones (AD 2.2.2). */-->
+<!--/* P-05: campos del alta y la edición de equipos, en cuatro secciones numeradas (AD 2.2.2). */-->
 <div th:fragment="campos(textoBoton, esAlta, urlCancelar)" class="formulario-equipo" th:object="${equipo}">
 
     <div class="resumen-errores" role="alert" tabindex="-1" id="resumen-errores" th:if="${#fields.hasErrors('*')}">
@@ -9,7 +9,7 @@
         <p class="mb-1" th:each="e : ${#fields.globalErrors()}" th:text="${e}">Error general</p>
         <!--/* En el orden en que aparecen los campos, con un enlace a cada uno. */-->
         <ul>
-            <th:block th:each="campo : ${ {'numInventario', 'numSerie', 'nombre', 'tipoId', 'marcaId', 'modelo', 'areaId', 'procesador',
+            <th:block th:each="campo : ${ {'nombre', 'tipoId', 'marcaId', 'modelo', 'numInventario', 'numSerie', 'areaId', 'procesador',
                                            'memoriaGb', 'almacenamientoGb', 'sistemaOperativo', 'puertos', 'direccionIp',
                                            'tamanoPulgadas', 'resolucion', 'capacidadVa', 'autonomiaMinutos',
                                            'fechaAdquisicion', 'costo', 'observaciones'} }">
@@ -21,28 +21,12 @@
     </div>
 
     <fieldset class="seccion-formulario">
-        <legend>Identificación</legend>
+        <legend><span class="numero-seccion" aria-hidden="true">1</span> Datos generales</legend>
         <div class="campos-dos-columnas">
             <div>
-                <label class="form-label" for="numInventario">Número de inventario <span class="obligatorio" aria-hidden="true">*</span></label>
-                <input class="form-control" type="text" th:field="*{numInventario}" maxlength="30" required autocomplete="off"
-                       autocapitalize="characters" spellcheck="false" th:errorclass="is-invalid"
-                       aria-describedby="numInventario-ayuda" th:autofocus="${esAlta}">
-                <div class="form-text" id="numInventario-ayuda">El número de la etiqueta patrimonial, por ejemplo BBJ-0001.</div>
-                <div class="invalid-feedback" th:if="${#fields.hasErrors('numInventario')}" th:errors="*{numInventario}">Error</div>
-            </div>
-            <div>
-                <label class="form-label" for="numSerie">Número de serie <span class="obligatorio" aria-hidden="true">*</span></label>
-                <input class="form-control" type="text" th:field="*{numSerie}" maxlength="60" required autocomplete="off"
-                       autocapitalize="characters" spellcheck="false" th:errorclass="is-invalid"
-                       aria-describedby="numSerie-ayuda">
-                <div class="form-text" id="numSerie-ayuda">Viene en la etiqueta del fabricante.</div>
-                <div class="invalid-feedback" th:if="${#fields.hasErrors('numSerie')}" th:errors="*{numSerie}">Error</div>
-            </div>
-            <div class="campo-completo">
                 <label class="form-label" for="nombre">Nombre del equipo <span class="obligatorio" aria-hidden="true">*</span></label>
                 <input class="form-control" type="text" th:field="*{nombre}" maxlength="80" required autocomplete="off"
-                       th:errorclass="is-invalid" aria-describedby="nombre-ayuda">
+                       th:errorclass="is-invalid" aria-describedby="nombre-ayuda" th:autofocus="${esAlta and equipo.nombre == null}">
                 <div class="form-text" id="nombre-ayuda">Cómo lo reconocen en el área, por ejemplo «PC de préstamo 3» o «Impresora de Dirección».</div>
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">Error</div>
             </div>
@@ -62,7 +46,7 @@
                 </select>
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('marcaId')}" th:errors="*{marcaId}">Error</div>
             </div>
-            <div class="campo-completo">
+            <div>
                 <label class="form-label" for="modelo">Modelo <span class="obligatorio" aria-hidden="true">*</span></label>
                 <input class="form-control" type="text" th:field="*{modelo}" maxlength="80" required autocomplete="off"
                        th:errorclass="is-invalid">
@@ -72,10 +56,39 @@
     </fieldset>
 
     <fieldset class="seccion-formulario">
-        <legend>Ubicación</legend>
+        <legend><span class="numero-seccion" aria-hidden="true">2</span> Identificación y estado</legend>
         <div class="campos-dos-columnas">
             <div>
-                <label class="form-label" for="areaId">Área <span class="obligatorio" aria-hidden="true">*</span></label>
+                <label class="form-label" for="numInventario">Número de inventario <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input class="form-control" type="text" th:field="*{numInventario}" maxlength="30" required autocomplete="off"
+                       autocapitalize="characters" spellcheck="false" th:errorclass="is-invalid"
+                       aria-describedby="numInventario-ayuda" th:autofocus="${esAlta and equipo.nombre != null}">
+                <div class="form-text" id="numInventario-ayuda">El número de la etiqueta patrimonial, por ejemplo BBJ-0001.</div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('numInventario')}" th:errors="*{numInventario}">Error</div>
+            </div>
+            <div>
+                <label class="form-label" for="numSerie">Número de serie <span class="obligatorio" aria-hidden="true">*</span></label>
+                <input class="form-control" type="text" th:field="*{numSerie}" maxlength="60" required autocomplete="off"
+                       autocapitalize="characters" spellcheck="false" th:errorclass="is-invalid"
+                       aria-describedby="numSerie-ayuda">
+                <div class="form-text" id="numSerie-ayuda">Viene en la etiqueta del fabricante.</div>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('numSerie')}" th:errors="*{numSerie}">Error</div>
+            </div>
+            <div>
+                <span class="form-label d-block" id="estado-etiqueta">Estado actual</span>
+                <div class="estado-fijo" aria-labelledby="estado-etiqueta" aria-describedby="estado-ayuda">
+                    <span class="estado-equipo" th:if="${existente == null}">
+                        <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Operativo
+                    </span>
+                    <span class="estado-equipo" th:if="${existente != null}" th:classappend="|estado--${existente.estado.clase}|">
+                        <i class="bi" th:classappend="|bi-${existente.estado.icono}|" aria-hidden="true"></i>
+                        <span th:text="${existente.estado.etiqueta}">Operativo</span>
+                    </span>
+                </div>
+                <div class="form-text" id="estado-ayuda" th:text="${existente == null} ? 'Todo equipo nuevo entra como Operativo.' : 'Cambia con un movimiento, no desde aquí.'">Estado</div>
+            </div>
+            <div>
+                <label class="form-label" for="areaId">Ubicación / área <span class="obligatorio" aria-hidden="true">*</span></label>
                 <select class="form-select" th:field="*{areaId}" required th:errorclass="is-invalid" aria-describedby="areaId-ayuda">
                     <option value="">Elige un área</option>
                     <option th:each="a : ${areas}" th:value="${a.id}" th:text="${a.nombre}"
@@ -84,15 +97,15 @@
                 <div class="form-text" id="areaId-ayuda" data-detalle-area>Dónde está físicamente el equipo.</div>
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('areaId')}" th:errors="*{areaId}">Error</div>
             </div>
-            <div class="nota-campo">
-                <i class="bi bi-person-badge" aria-hidden="true"></i>
-                <p>El responsable no se captura aquí: se asigna con un resguardo, que genera su formato en PDF.</p>
-            </div>
         </div>
+        <p class="nota-campo">
+            <i class="bi bi-person-badge" aria-hidden="true"></i>
+            <span>El responsable no se captura aquí: se asigna con un resguardo, que genera su formato en PDF.</span>
+        </p>
     </fieldset>
 
     <fieldset class="seccion-formulario">
-        <legend>Características técnicas</legend>
+        <legend><span class="numero-seccion" aria-hidden="true">3</span> Características técnicas</legend>
         <p class="indicacion-grupo" data-sin-tipo th:hidden="${grupoActual != null}">Elige el tipo de equipo para ver sus características.</p>
 
         <div class="campos-dos-columnas" data-grupo="COMPUTO" th:hidden="${grupoActual != 'COMPUTO'}">
@@ -189,7 +202,7 @@
             </div>
         </div>
 
-        <div class="campos-dos-columnas" data-grupo="ENERGIA" th:hidden="${grupoActual != 'ENERGIA'}">
+        <div class="campos-dos-columnas" data-grupo="ENERGIA" th:hidden="${grupoActual != 'ENERGIA'}">        <div class="campos-dos-columnas" data-grupo="ENERGIA" th:hidden="${grupoActual != 'ENERGIA'}">
             <div>
                 <label class="form-label" for="capacidadVa">Capacidad (VA)</label>
                 <input class="form-control" type="number" th:field="*{capacidadVa}" min="1" inputmode="numeric" th:errorclass="is-invalid">
@@ -204,7 +217,7 @@
     </fieldset>
 
     <fieldset class="seccion-formulario">
-        <legend>Adquisición</legend>
+        <legend><span class="numero-seccion" aria-hidden="true">4</span> Detalles adicionales</legend>
         <div class="campos-dos-columnas">
             <div>
                 <label class="form-label" for="fechaAdquisicion">Fecha de adquisición</label>
@@ -214,28 +227,27 @@
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('fechaAdquisicion')}" th:errors="*{fechaAdquisicion}">Error</div>
             </div>
             <div>
-                <label class="form-label" for="costo">Costo (pesos)</label>
+                <label class="form-label" for="costo">Costo de adquisición</label>
                 <div class="input-group has-validation">
                     <span class="input-group-text" aria-hidden="true">$</span>
                     <input class="form-control" type="number" th:field="*{costo}" min="0" step="0.01" inputmode="decimal" th:errorclass="is-invalid">
+                    <span class="input-group-text">MXN</span>
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('costo')}" th:errors="*{costo}">Error</div>
                 </div>
+            </div>
+            <div class="campo-completo">
+                <label class="form-label" for="observaciones">Notas / observaciones</label>
+        <textarea class="form-control" th:field="*{observaciones}" rows="3" maxlength="1000"
+                  placeholder="Por ejemplo: le falta el cable de corriente." th:errorclass="is-invalid"></textarea>
+        <div class="invalid-feedback" th:if="${#fields.hasErrors('observaciones')}" th:errors="*{observaciones}">Error</div>
             </div>
         </div>
     </fieldset>
 
-    <fieldset class="seccion-formulario">
-        <legend>Observaciones</legend>
-        <label class="form-label visually-hidden" for="observaciones">Observaciones</label>
-        <textarea class="form-control" th:field="*{observaciones}" rows="3" maxlength="1000"
-                  placeholder="Por ejemplo: le falta el cable de corriente." th:errorclass="is-invalid"></textarea>
-        <div class="invalid-feedback" th:if="${#fields.hasErrors('observaciones')}" th:errors="*{observaciones}">Error</div>
-    </fieldset>
-
     <div class="acciones-formulario">
-        <button class="btn btn-primary" type="submit" th:text="${textoBoton}">Guardar</button>
-        <button class="btn btn-outline-primary" type="submit" name="otro" value="1" th:if="${esAlta}">Registrar y agregar otro</button>
-        <a class="btn btn-outline-secondary" th:href="@{${urlCancelar}}">Cancelar</a>
+        <a class="btn btn-secondary" th:href="@{${urlCancelar}}">Cancelar</a>
+        <button class="btn btn-outline-primary" type="submit" name="otro" value="1" th:if="${esAlta}">Guardar y agregar otro</button>
+        <button class="btn btn-primary" type="submit" th:text="${textoBoton}">Guardar equipo</button>
     </div>
 </div>
 </body>

@@ -14,10 +14,13 @@
             <div class="d-flex align-items-start justify-content-between">
                 <!--/* Sustituir por el logotipo oficial cuando el cliente lo entregue (actividad 3.2). */-->
                 <a class="app-marca" th:href="@{/}">
-                    <span class="app-marca__sigla">SIGIT</span>
-                    <span class="app-marca__institucion">Biblioteca Benito Juárez</span>
+                    <span class="logotipo" aria-hidden="true"><i class="bi bi-laptop"></i></span>
+                    <span class="app-marca__texto">
+                        <span class="app-marca__sigla">SIGIT</span>
+                        <span class="app-marca__institucion">Biblioteca Benito Juárez</span>
+                    </span>
                 </a>
-                <button type="button" class="btn-close m-2 d-lg-none" data-bs-dismiss="offcanvas"
+                <button type="button" class="btn-close m-3 d-lg-none" data-bs-dismiss="offcanvas"
                         data-bs-target="#menu-lateral" aria-label="Cerrar menú"></button>
             </div>
             <nav aria-label="Menú principal">
@@ -31,25 +34,37 @@
                     </li>
                 </ul>
             </nav>
+            <p class="app-lateral__pie" th:text="|© ${#temporals.year(#temporals.createNow())} Biblioteca Benito Juárez|">© Biblioteca Benito Juárez</p>
         </div>
     </div>
 
     <div class="app-cuerpo">
         <header class="app-encabezado">
-            <button class="btn btn-outline-primary text-nowrap d-lg-none" type="button" data-bs-toggle="offcanvas"
+            <button class="btn btn-outline-secondary text-nowrap d-lg-none" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#menu-lateral" aria-controls="menu-lateral">
                 <i class="bi bi-list" aria-hidden="true"></i> Menú
             </button>
-            <div class="app-encabezado__usuario">
-                <span class="app-encabezado__nombre" th:text="${usuarioActual.nombre}">Nombre</span>
-                <span class="app-encabezado__rol" th:text="${usuarioActual.rol}">Rol</span>
-            </div>
-            <form th:action="@{/logout}" method="post">
-                <button type="submit" class="btn btn-outline-secondary text-nowrap" aria-label="Cerrar sesión">
-                    <i class="bi bi-box-arrow-right d-sm-none" aria-hidden="true"></i>
-                    <span class="d-none d-sm-inline">Cerrar sesión</span>
+            <div class="dropdown usuario-menu">
+                <button class="usuario-menu__boton dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="usuario-menu__datos d-none d-sm-block">
+                        <span class="usuario-menu__nombre" th:text="${usuarioActual.nombre}">Nombre</span>
+                        <span class="usuario-menu__rol" th:text="${usuarioActual.rol}">Rol</span>
+                    </span>
+                    <span class="avatar" aria-hidden="true" th:text="${usuarioActual.iniciales()}">AB</span>
+                    <span class="visually-hidden d-sm-none" th:text="|Menú de ${usuarioActual.nombre}|">Menú de usuario</span>
                 </button>
-            </form>
+                <div class="dropdown-menu dropdown-menu-end">
+                    <p class="px-2 pt-1 mb-2 d-sm-none">
+                        <strong class="d-block" th:text="${usuarioActual.nombre}">Nombre</strong>
+                        <span class="usuario-menu__rol" th:text="${usuarioActual.rol}">Rol</span>
+                    </p>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="dropdown-item">
+                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
         </header>
 
         <main class="app-principal" id="contenido" tabindex="-1">

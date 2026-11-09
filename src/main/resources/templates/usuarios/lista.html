@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{fragmentos/pagina :: pagina('Usuarios', ~{::#acciones}, ~{::#cuerpo-pagina})}">
 <body>
-<a id="acciones" class="btn btn-primary" th:href="@{/usuarios/nuevo}">
+<a id="acciones" class="btn btn-primary btn-nuevo" th:href="@{/usuarios/nuevo}">
     <i class="bi bi-person-plus" aria-hidden="true"></i> Agregar usuario
 </a>
 
@@ -20,7 +20,7 @@
                         th:selected="${rolId == r.id}">Rol</option>
             </select>
         </div>
-        <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        <button class="btn btn-marino" type="submit">Buscar</button>
         <a class="btn btn-link" th:href="@{/usuarios}" th:if="${q != '' or rolId != null}">Quitar filtros</a>
     </form>
 

@@ -17,6 +17,17 @@ public record UsuarioSesion(Long id, String nombre, String correo, String rol) i
 		return List.of(new SimpleGrantedAuthority("ROLE_" + rol));
 	}
 
+	/** Hasta dos iniciales del nombre, para el avatar del encabezado. */
+	public String iniciales() {
+		StringBuilder iniciales = new StringBuilder();
+		for (String palabra : nombre.trim().split("\\s+")) {
+			if (!palabra.isEmpty() && iniciales.length() < 2) {
+				iniciales.appendCodePoint(Character.toUpperCase(palabra.codePointAt(0)));
+			}
+		}
+		return iniciales.toString();
+	}
+
 	public boolean tieneRol(String nombreRol) {
 		return rol.equals(nombreRol);
 	}

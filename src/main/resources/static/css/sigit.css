@@ -1146,3 +1146,39 @@ h1, .h1 {
     border: 0;
     min-width: 0;
 }
+
+/* Confirmación del registro de un equipo (Tarea 2) */
+.resumen-registro {
+    max-width: 52rem;
+    margin-bottom: 1.25rem;
+    padding: 1.25rem;
+    border-left: 4px solid var(--sigit-henequen);
+    background: #fff;
+}
+
+.resumen-registro h2 {
+    display: flex;
+    gap: .5rem;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+
+.resumen-registro h2 .bi {
+    color: var(--sigit-henequen);
+}
+
+.resumen-registro__datos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: .75rem 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.resumen-registro__datos dt {
+    font-size: .875rem;
+    font-weight: 700;
+}
+
+.resumen-registro__datos dd {
+    margin: 0;
+}

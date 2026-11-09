@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import mx.tecnologiccorp.sigit.catalogos.Area;
 import mx.tecnologiccorp.sigit.catalogos.AreaRepository;
+import mx.tecnologiccorp.sigit.inventario.EquipoRepository;
 import mx.tecnologiccorp.sigit.seguridad.BloqueoDeAcceso;
 import mx.tecnologiccorp.sigit.seguridad.Rol;
 import mx.tecnologiccorp.sigit.seguridad.RolRepository;
@@ -49,6 +50,9 @@ public abstract class PruebaIntegracion {
 	protected PasswordEncoder cifrador;
 
 	@Autowired
+	protected EquipoRepository equipos;
+
+	@Autowired
 	protected BloqueoDeAcceso bloqueo;
 
 	@Autowired
@@ -58,6 +62,7 @@ public abstract class PruebaIntegracion {
 
 	@BeforeEach
 	void limpiarDatos() {
+		equipos.deleteAll();
 		usuarios.deleteAll();
 		areas.deleteAll();
 		bloqueo.limpiarTodo();

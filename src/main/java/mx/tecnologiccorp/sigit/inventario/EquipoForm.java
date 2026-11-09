@@ -1,4 +1,4 @@
-package mx.tecnologiccorp.sigit.prototipos;
+package mx.tecnologiccorp.sigit.inventario;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,10 +9,14 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 
-/** Campos de P-05 según el diccionario de datos (tabla equipos, AD 2.2.2). */
+/**
+ * Campos de P-05 según el diccionario de datos (tabla equipos, AD 2.2.2), más el nombre que pide la
+ * Tarea 2. Las reglas que consultan la base de datos (duplicados, catálogos) están en EquipoService.
+ */
 public class EquipoForm {
 
 	// Identificación
@@ -23,6 +27,10 @@ public class EquipoForm {
 	@NotBlank(message = "Escribe el número de serie.")
 	@Size(max = 60, message = "El número de serie no debe tener más de 60 caracteres.")
 	private String numSerie;
+
+	@NotBlank(message = "Escribe el nombre del equipo.")
+	@Size(max = 80, message = "El nombre no debe tener más de 80 caracteres.")
+	private String nombre;
 
 	@NotNull(message = "Elige el tipo de equipo.")
 	private Long tipoId;
@@ -67,7 +75,8 @@ public class EquipoForm {
 
 	private Boolean administrable;
 
-	@Size(max = 45, message = "La dirección IP no debe tener más de 45 caracteres.")
+	@Pattern(regexp = "^((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.){3}(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)$",
+			message = "Escribe una dirección IP válida, por ejemplo 192.168.10.2.")
 	private String direccionIp;
 
 	@Min(value = 1, message = "El tamaño debe ser de al menos 1 pulgada.")
@@ -98,6 +107,7 @@ public class EquipoForm {
 	/** Para «Registrar y agregar otro»: conserva lo que suele repetirse en un levantamiento. */
 	public EquipoForm copiaParaElSiguiente() {
 		EquipoForm siguiente = new EquipoForm();
+		siguiente.nombre = nombre;
 		siguiente.tipoId = tipoId;
 		siguiente.marcaId = marcaId;
 		siguiente.modelo = modelo;
@@ -129,6 +139,8 @@ public class EquipoForm {
 	public void setNumInventario(String v) { numInventario = limpiar(v) == null ? null : limpiar(v).toUpperCase(); }
 	public String getNumSerie() { return numSerie; }
 	public void setNumSerie(String v) { numSerie = limpiar(v) == null ? null : limpiar(v).toUpperCase(); }
+	public String getNombre() { return nombre; }
+	public void setNombre(String v) { nombre = limpiar(v); }
 	public Long getTipoId() { return tipoId; }
 	public void setTipoId(Long v) { tipoId = v; }
 	public Long getMarcaId() { return marcaId; }

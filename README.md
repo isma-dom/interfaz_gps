@@ -30,6 +30,10 @@ export SIGIT_SEED_PASSWORD='<elige una contraseña con letras y números>'
 
 Spring Boot levanta solo el MySQL de `compose.yaml`, aplica las migraciones y abre la aplicación en http://localhost:8080.
 
+## Alta de equipos (Tarea 2)
+
+El Administrador registra equipos en Equipos → Registrar equipo (http://localhost:8080/equipos/nuevo). Se guardan en la tabla `equipos` de MySQL, creada por la migración `V2__inventario.sql` con los catálogos iniciales de tipos y marcas. Antes del primer alta tiene que existir al menos un área.
+
 ## Prototipo de equipos (Tarea 1)
 
 Con el perfil `dev` existe un prototipo navegable de las pantallas P-03 (listado) y P-05 (registro y edición) de equipos, con 26 equipos de ejemplo en memoria: http://localhost:8080/prototipos/equipos. Registrar, editar y dar de baja es solo del Administrador; Consulta ve únicamente su área. Los equipos se pierden al reiniciar: guardarlos en MySQL es una tarea posterior.

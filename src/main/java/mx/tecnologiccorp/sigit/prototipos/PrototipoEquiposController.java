@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import mx.tecnologiccorp.sigit.inventario.EquipoForm;
 import mx.tecnologiccorp.sigit.inventario.EstadoEquipo;
 import mx.tecnologiccorp.sigit.seguridad.Pantalla;
 import mx.tecnologiccorp.sigit.seguridad.Rol;
@@ -184,6 +185,7 @@ public class PrototipoEquiposController {
 		EquipoForm formulario = new EquipoForm();
 		formulario.setNumInventario(equipo.numInventario());
 		formulario.setNumSerie(equipo.numSerie());
+		formulario.setNombre(equipo.nombre());
 		formulario.setTipoId(equipo.tipo().id());
 		formulario.setMarcaId(equipo.marca().id());
 		formulario.setModelo(equipo.modelo());

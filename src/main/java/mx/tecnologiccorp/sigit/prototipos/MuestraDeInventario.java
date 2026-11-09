@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
+import mx.tecnologiccorp.sigit.inventario.EquipoForm;
 import mx.tecnologiccorp.sigit.inventario.EstadoEquipo;
 import mx.tecnologiccorp.sigit.inventario.GrupoTecnico;
 

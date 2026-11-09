@@ -7,7 +7,7 @@
         Los campos con <span class="obligatorio">*</span> son obligatorios. El equipo queda como Operativo y el sistema
         genera su código QR al guardar.
     </p>
-    <div th:replace="~{equipos/formulario :: campos('Registrar equipo', true)}"></div>
+    <div th:replace="~{equipos/formulario :: campos('Registrar equipo', true, '/prototipos/equipos')}"></div>
 </form>
 </body>
 </html>

@@ -41,6 +41,7 @@ class PrototipoEquiposTest extends PruebaIntegracion {
 		return post("/prototipos/equipos").with(csrf())
 			.param("numInventario", inventario)
 			.param("numSerie", serie)
+			.param("nombre", "PC de préstamo")
 			.param("tipoId", "1")
 			.param("marcaId", "8")
 			.param("modelo", "ProDesk 405 G8")
@@ -78,7 +79,7 @@ class PrototipoEquiposTest extends PruebaIntegracion {
 			.param("costo", "-5")
 			.with(como(crearUsuario(Rol.ADMINISTRADOR))))
 			.andExpect(status().isOk())
-			.andExpect(content().string(containsString("Revisa 7 campos")))
+			.andExpect(content().string(containsString("Revisa 8 campos")))
 			.andExpect(content().string(containsString("Ya existe un equipo con este número de inventario.")))
 			.andExpect(content().string(containsString("El costo no puede ser negativo.")));
 	}

@@ -6,12 +6,15 @@ package mx.tecnologiccorp.sigit.inventario;
  */
 public enum EstadoEquipo {
 
-	OPERATIVO("Operativo", "check-circle-fill", "operativo"),
-	EN_REPARACION("En reparación", "tools", "reparacion"),
-	INACTIVO("Inactivo", "pause-circle", "inactivo"),
-	CANDIDATO_BAJA("Candidato a baja", "exclamation-triangle-fill", "candidato"),
-	BAJA("Baja", "x-circle", "baja"),
-	REVISION_PENDIENTE("Revisión pendiente", "question-circle-fill", "revision");
+	OPERATIVO("operativo", "Operativo", "check-circle-fill", "operativo"),
+	EN_REPARACION("en_reparacion", "En reparación", "tools", "reparacion"),
+	INACTIVO("inactivo", "Inactivo", "pause-circle", "inactivo"),
+	CANDIDATO_BAJA("candidato_baja", "Candidato a baja", "exclamation-triangle-fill", "candidato"),
+	BAJA("baja", "Baja", "x-circle", "baja"),
+	REVISION_PENDIENTE("revision_pendiente", "Revisión pendiente", "question-circle-fill", "revision");
+
+	/** Valor guardado en la columna equipos.estado, como en el diccionario de datos. */
+	private final String codigo;
 
 	private final String etiqueta;
 
@@ -19,7 +22,8 @@ public enum EstadoEquipo {
 
 	private final String clase;
 
-	EstadoEquipo(String etiqueta, String icono, String clase) {
+	EstadoEquipo(String codigo, String etiqueta, String icono, String clase) {
+		this.codigo = codigo;
 		this.etiqueta = etiqueta;
 		this.icono = icono;
 		this.clase = clase;
@@ -31,6 +35,19 @@ public enum EstadoEquipo {
 	 */
 	public boolean admiteBaja() {
 		return this == CANDIDATO_BAJA || this == REVISION_PENDIENTE;
+	}
+
+	public static EstadoEquipo deCodigo(String codigo) {
+		for (EstadoEquipo estado : values()) {
+			if (estado.codigo.equals(codigo)) {
+				return estado;
+			}
+		}
+		throw new IllegalArgumentException("Estado de equipo desconocido: " + codigo);
+	}
+
+	public String getCodigo() {
+		return codigo;
 	}
 
 	public String getEtiqueta() {

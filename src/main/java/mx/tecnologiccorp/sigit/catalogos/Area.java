@@ -50,4 +50,12 @@ public class Area {
 		return piso;
 	}
 
+	/** Edificio y piso, para confirmar la ubicación al elegir el área. */
+	public String detalle() {
+		if (edificio == null && piso == null) {
+			return nombre;
+		}
+		return (edificio == null ? "" : edificio) + (piso == null ? "" : (edificio == null ? "Piso " : ", piso ") + piso);
+	}
+
 }

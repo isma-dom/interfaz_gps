@@ -13,7 +13,7 @@ import mx.tecnologiccorp.sigit.seguridad.Peticiones;
 @Controller
 public class EnConstruccionController {
 
-	@GetMapping({ "/tablero", "/equipos", "/escaneo", "/resguardos", "/importaciones", "/reportes", "/catalogos",
+	@GetMapping({ "/tablero", "/escaneo", "/resguardos", "/importaciones", "/reportes", "/catalogos",
 			"/bitacora" })
 	public String mostrar(HttpServletRequest peticion, Model modelo) {
 		modelo.addAttribute("titulo", Pantalla.porRuta(Peticiones.ruta(peticion)).orElseThrow().getEtiqueta());

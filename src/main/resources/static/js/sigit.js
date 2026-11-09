@@ -170,14 +170,21 @@
         var grupos = document.querySelectorAll('fieldset [data-grupo]');
         var indicacion = document.querySelector('[data-sin-tipo]');
 
-        tipo.addEventListener('change', function () {
+        // Los campos de los grupos ocultos se desactivan: no se envían ni se validan.
+        function actualizar() {
             var opcion = tipo.selectedOptions[0];
             var grupo = opcion && opcion.dataset.grupoTecnico;
             grupos.forEach(function (bloque) {
                 bloque.hidden = bloque.dataset.grupo !== grupo;
+                bloque.querySelectorAll('input, select, textarea').forEach(function (campo) {
+                    campo.disabled = bloque.hidden;
+                });
             });
             indicacion.hidden = Boolean(grupo);
-        });
+        }
+
+        tipo.addEventListener('change', actualizar);
+        actualizar();
     }
 
     // Debajo del área se ve el edificio y el piso, para confirmar la ubicación.

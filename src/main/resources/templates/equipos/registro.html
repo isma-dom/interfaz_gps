@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/pagina :: pagina('Registrar equipo', ~{}, ~{::#cuerpo-pagina})}">
+<body>
+<!--/* P-05: alta real de equipos (Tarea 2). Los campos son los del diseño de la Tarea 1. */-->
+<form id="cuerpo-pagina" method="post" th:action="@{/equipos}" novalidate>
+    <div class="confirmacion-registro" th:if="${registrado != null}" th:insert="~{equipos/inicio :: resumen}"></div>
+
+    <div class="superficie estado-vacio" th:if="${areas.empty}">
+        <h2 class="h5">Primero hace falta registrar las áreas</h2>
+        <p class="mb-0">Cada equipo se ubica en un área, y todavía no hay ninguna. Se capturan en Catálogos.</p>
+    </div>
+
+    <th:block th:unless="${areas.empty}">
+        <p class="texto-acotado introduccion-formulario">
+            Los campos con <span class="obligatorio">*</span> son obligatorios. El equipo queda como Operativo y el sistema
+            le asigna su código QR al guardar.
+        </p>
+        <div th:replace="~{equipos/formulario :: campos('Registrar equipo', true, '/equipos')}"></div>
+    </th:block>
+</form>
+</body>
+</html>

@@ -1409,6 +1409,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     align-items: center;
     gap: .75rem 2rem;
     margin-bottom: 1.5rem;
+    max-width: 56rem;
     padding: 1rem 1.25rem;
     border-radius: .75rem;
     background: #f8fafc;

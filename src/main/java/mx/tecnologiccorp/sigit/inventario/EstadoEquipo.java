@@ -25,6 +25,14 @@ public enum EstadoEquipo {
 		this.clase = clase;
 	}
 
+	/**
+	 * Solo un equipo Candidato a baja o en Revisión pendiente (no localizado) puede pasar a Baja
+	 * (AD 2.2.3). La Baja es definitiva: no admite más movimientos (RN-04).
+	 */
+	public boolean admiteBaja() {
+		return this == CANDIDATO_BAJA || this == REVISION_PENDIENTE;
+	}
+
 	public String getEtiqueta() {
 		return etiqueta;
 	}

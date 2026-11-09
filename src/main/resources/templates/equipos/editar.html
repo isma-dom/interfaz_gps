@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{fragmentos/pagina :: pagina(|Editar equipo ${existente.numInventario}|, ~{}, ~{::#cuerpo-pagina})}">
 <body>
-<form id="cuerpo-pagina" method="post" th:action="@{/prototipos/equipos/{id}(id=${existente.id})}" novalidate>
+<div id="cuerpo-pagina" th:with="dadoDeBaja=${existente.estado.name() == 'BAJA'}">
     <div class="datos-fijos">
         <div>
             <span class="datos-fijos__etiqueta">Estado</span>
@@ -15,9 +15,52 @@
             <span class="datos-fijos__etiqueta">Responsable</span>
             <span th:text="${existente.responsable ?: 'Sin resguardo'}">Sin resguardo</span>
         </div>
-        <p>El estado y el responsable cambian con un movimiento o un resguardo, no desde aquí.</p>
+        <button class="btn btn-outline-danger datos-fijos__accion" type="button" th:if="${existente.estado.admiteBaja()}"
+                data-bs-toggle="modal" data-bs-target="#modal-baja">Dar de baja</button>
+        <p th:if="${dadoDeBaja}">Este equipo está dado de baja: sus datos se conservan, pero ya no admite cambios ni movimientos.</p>
+        <p th:unless="${dadoDeBaja}">El estado y el responsable cambian con un movimiento o un resguardo, no desde aquí.
+            <th:block th:unless="${existente.estado.admiteBaja()}">Para darlo de baja, primero debe quedar como Candidato a baja.</th:block>
+        </p>
     </div>
-    <div th:replace="~{equipos/formulario :: campos('Guardar cambios', false)}"></div>
-</form>
+
+    <form method="post" th:action="@{/prototipos/equipos/{id}(id=${existente.id})}" novalidate>
+        <fieldset class="sin-marco" th:disabled="${dadoDeBaja}">
+            <div th:replace="~{equipos/formulario :: campos('Guardar cambios', false)}"></div>
+        </fieldset>
+    </form>
+
+    <!--/* Baja (RF-02, RF-07, RN-04): motivo obligatorio y sin resguardo activo. */-->
+    <div class="modal fade" id="modal-baja" tabindex="-1" aria-labelledby="modal-baja-titulo" aria-hidden="true"
+         th:if="${existente.estado.admiteBaja()}">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" method="post" th:action="@{/prototipos/equipos/{id}/baja(id=${existente.id})}">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="modal-baja-titulo" th:text="|Dar de baja ${existente.numInventario}|">Dar de baja</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <th:block th:if="${existente.responsable != null}">
+                        <p class="mb-0">
+                            Antes de darlo de baja, libera el resguardo de <strong th:text="${existente.responsable}">responsable</strong>.
+                            Un equipo con resguardo activo no se puede dar de baja.
+                        </p>
+                    </th:block>
+                    <th:block th:if="${existente.responsable == null}">
+                        <p>La baja es definitiva: el equipo deja de contar en los indicadores y ya no admite movimientos.
+                            Queda registrada con tu usuario y la fecha.</p>
+                        <label class="form-label fw-bold" for="motivo">Motivo de la baja</label>
+                        <textarea class="form-control" id="motivo" name="motivo" rows="3" minlength="10" maxlength="500" required
+                                  aria-describedby="motivo-ayuda"></textarea>
+                        <div class="form-text" id="motivo-ayuda">Por ejemplo: tarjeta madre dañada, el costo de reparación supera su valor.</div>
+                    </th:block>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger" th:if="${existente.responsable == null}">Dar de baja</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -32,7 +32,7 @@ Spring Boot levanta solo el MySQL de `compose.yaml`, aplica las migraciones y ab
 
 ## Prototipo de equipos (Tarea 1)
 
-Con el perfil `dev` existe un prototipo navegable de las pantallas P-03 (listado) y P-05 (registro y edición) de equipos, con 25 equipos de ejemplo en memoria: http://localhost:8080/prototipos/equipos. Registrar y editar es solo del Administrador; Consulta ve únicamente su área. Los equipos se pierden al reiniciar: guardarlos en MySQL es una tarea posterior.
+Con el perfil `dev` existe un prototipo navegable de las pantallas P-03 (listado) y P-05 (registro y edición) de equipos, con 26 equipos de ejemplo en memoria: http://localhost:8080/prototipos/equipos. Registrar, editar y dar de baja es solo del Administrador; Consulta ve únicamente su área. Los equipos se pierden al reiniciar: guardarlos en MySQL es una tarea posterior.
 
 ## Usuarios de prueba
 

@@ -120,7 +120,8 @@
                     </td>
                     <td class="tabla-equipos__acciones" th:if="${puedeEditar}">
                         <a class="btn btn-outline-primary" th:href="@{/prototipos/equipos/{id}/editar(id=${e.id})}"
-                           th:aria-label="|Editar ${e.numInventario}|">Editar</a>
+                           th:aria-label="${e.estado.name() == 'BAJA'} ? |Ver ${e.numInventario}| : |Editar ${e.numInventario}|"
+                           th:text="${e.estado.name() == 'BAJA'} ? 'Ver' : 'Editar'">Editar</a>
                     </td>
                 </tr>
                 </tbody>

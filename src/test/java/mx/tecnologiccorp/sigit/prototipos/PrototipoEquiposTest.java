@@ -10,17 +10,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import mx.tecnologiccorp.sigit.PruebaIntegracion;
+import mx.tecnologiccorp.sigit.inventario.EstadoEquipo;
 import mx.tecnologiccorp.sigit.seguridad.Rol;
 import mx.tecnologiccorp.sigit.seguridad.Usuario;
 
 /** Prototipo de la Tarea 1 (P-03 y P-05): solo existe con el perfil dev. */
 @ActiveProfiles("dev")
 class PrototipoEquiposTest extends PruebaIntegracion {
+
+	@Autowired
+	private MuestraDeInventario inventario;
+
+	private MuestraDeInventario.Equipo equipo(String numInventario) {
+		return inventario.buscar(numInventario, null, null, null, 0).getContent().get(0);
+	}
+
+	private MockHttpServletRequestBuilder baja(String numInventario, String motivo) {
+		return post("/prototipos/equipos/" + equipo(numInventario).id() + "/baja").with(csrf()).param("motivo", motivo);
+	}
 
 	private MockHttpServletRequestBuilder registro(String inventario, String serie) {
 		return post("/prototipos/equipos").with(csrf())
@@ -92,6 +107,49 @@ class PrototipoEquiposTest extends PruebaIntegracion {
 			.andExpect(status().isOk())
 			.andExpect(content().string(not(containsString("Registrar equipo"))));
 		mvc.perform(get("/prototipos/equipos/1/editar").with(como(ejecutivo))).andExpect(status().isForbidden());
+	}
+
+
+	/** RF-02 y RN-04: la baja exige el estado correcto, motivo y que no haya resguardo activo. */
+	@Test
+	void unCandidatoABajaSinResguardoSeDaDeBajaConMotivo() throws Exception {
+		mvc.perform(baja("BBJ-0013", "Tarjeta madre dañada, no conviene repararla.")
+			.with(como(crearUsuario(Rol.ADMINISTRADOR))))
+			.andExpect(redirectedUrl("/prototipos/equipos"))
+			.andExpect(flash().attribute("exito", "Equipo BBJ-0013 dado de baja."));
+
+		assertThat(equipo("BBJ-0013").estado()).isEqualTo(EstadoEquipo.BAJA);
+	}
+
+	@Test
+	void laBajaExigeMotivo() throws Exception {
+		mvc.perform(baja("BBJ-0033", "").with(como(crearUsuario(Rol.ADMINISTRADOR))))
+			.andExpect(flash().attribute("error", "Escribe el motivo de la baja, con al menos 10 caracteres."));
+
+		assertThat(equipo("BBJ-0033").estado()).isEqualTo(EstadoEquipo.REVISION_PENDIENTE);
+	}
+
+	@Test
+	void unEquipoConResguardoActivoNoSeDaDeBaja() throws Exception {
+		mvc.perform(baja("BBJ-0010", "Equipo obsoleto con Windows 7.").with(como(crearUsuario(Rol.ADMINISTRADOR))))
+			.andExpect(flash().attribute("error", "Primero libera el resguardo de Mario Canché Uc."));
+
+		assertThat(equipo("BBJ-0010").estado()).isEqualTo(EstadoEquipo.CANDIDATO_BAJA);
+	}
+
+	@Test
+	void unEquipoOperativoNoSeDaDeBajaDirectamente() throws Exception {
+		mvc.perform(baja("BBJ-0004", "Se descompuso el escáner.").with(como(crearUsuario(Rol.ADMINISTRADOR))))
+			.andExpect(flash().attribute("error",
+					"Solo se puede dar de baja un equipo Candidato a baja o en Revisión pendiente."));
+
+		assertThat(equipo("BBJ-0004").estado()).isEqualTo(EstadoEquipo.OPERATIVO);
+	}
+
+	@Test
+	void soloElAdministradorDaDeBaja() throws Exception {
+		mvc.perform(baja("BBJ-0033", "No se localizó en el levantamiento.").with(como(crearUsuario(Rol.EJECUTIVO))))
+			.andExpect(status().isForbidden());
 	}
 
 }

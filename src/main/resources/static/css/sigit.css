@@ -1134,3 +1134,15 @@ h1, .h1 {
     font-weight: 700;
     font-size: .875rem;
 }
+
+.datos-fijos__accion {
+    margin-left: auto;
+}
+
+/* Agrupa el formulario para desactivarlo completo cuando el equipo está dado de baja. */
+.sin-marco {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}

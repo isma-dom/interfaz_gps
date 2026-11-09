@@ -116,6 +116,10 @@ public class PrototipoEquiposController {
 			BindingResult resultado, Model modelo, RedirectAttributes redireccion) {
 		MuestraDeInventario.Equipo existente = inventario.equipo(id)
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		if (existente.estado() == EstadoEquipo.BAJA) {
+			redireccion.addFlashAttribute("error", "Un equipo dado de baja ya no admite cambios.");
+			return "redirect:/prototipos/equipos/" + id + "/editar";
+		}
 		validarUnicos(formulario, id, resultado);
 		if (resultado.hasErrors()) {
 			modelo.addAttribute("existente", existente);
@@ -136,6 +140,34 @@ public class PrototipoEquiposController {
 			.findFirst()
 			.orElse(null));
 		return nombre;
+	}
+
+	/**
+	 * Baja (RF-02, RF-07): solo desde Candidato a baja o Revisión pendiente, con motivo por escrito
+	 * y sin resguardo activo (RN-04).
+	 */
+	@PostMapping("/{id}/baja")
+	public String darDeBaja(@PathVariable Long id, @RequestParam(name = "motivo", required = false) String motivo,
+			RedirectAttributes redireccion) {
+		MuestraDeInventario.Equipo equipo = inventario.equipo(id)
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		String error = null;
+		if (!equipo.estado().admiteBaja()) {
+			error = "Solo se puede dar de baja un equipo Candidato a baja o en Revisión pendiente.";
+		}
+		else if (equipo.responsable() != null) {
+			error = "Primero libera el resguardo de " + equipo.responsable() + ".";
+		}
+		else if (motivo == null || motivo.trim().length() < 10) {
+			error = "Escribe el motivo de la baja, con al menos 10 caracteres.";
+		}
+		if (error != null) {
+			redireccion.addFlashAttribute("error", error);
+			return "redirect:/prototipos/equipos/" + id + "/editar";
+		}
+		inventario.darDeBaja(equipo);
+		redireccion.addFlashAttribute("exito", "Equipo " + equipo.numInventario() + " dado de baja.");
+		return "redirect:/prototipos/equipos";
 	}
 
 	private void validarUnicos(EquipoForm formulario, Long id, BindingResult resultado) {

@@ -150,6 +150,16 @@ public class MuestraDeInventario {
 		return equipo;
 	}
 
+	/** Cambia el estado a Baja conservando los demás datos; el motivo iría al movimiento (RF-07). */
+	public Equipo darDeBaja(Equipo equipo) {
+		Equipo dadoDeBaja = new Equipo(equipo.id(), equipo.numInventario(), equipo.numSerie(), equipo.tipo(),
+				equipo.marca(), equipo.modelo(), equipo.area(), equipo.responsable(), EstadoEquipo.BAJA,
+				equipo.sistemaOperativo(), equipo.resumenTecnico(), equipo.fechaAdquisicion());
+		equipos.remove(equipo);
+		equipos.add(dadoDeBaja);
+		return dadoDeBaja;
+	}
+
 	/** Lo que el listado muestra bajo el nombre del equipo. */
 	private static String resumen(Tipo tipo, EquipoForm f) {
 		List<String> partes = new ArrayList<>();
@@ -216,6 +226,7 @@ public class MuestraDeInventario {
 		ejemplo("BBJ-0004", "U63241K8N", 4, "Brother", "MFC-L2750DW", 1, null, op, null, "Láser, Red", 2020);
 		ejemplo("BBJ-0010", "8CC9310QVZ", 1, "HP", "ProDesk 600 G1", 2, "Mario Canché Uc", EstadoEquipo.CANDIDATO_BAJA, "Windows 7", "Core i5-4570, 8 GB RAM, Windows 7", 2014);
 		ejemplo("BBJ-0011", "8CC9310QW3", 1, "HP", "ProDesk 600 G1", 2, "Rosa Pech Dzul", EstadoEquipo.CANDIDATO_BAJA, "Windows 7", "Core i5-4570, 8 GB RAM, Windows 7", 2014);
+		ejemplo("BBJ-0013", "8CC9310QX8", 1, "HP", "ProDesk 600 G1", 2, null, EstadoEquipo.CANDIDATO_BAJA, "Windows 7", "Core i5-4570, 4 GB RAM, Windows 7", 2013);
 		ejemplo("BBJ-0012", "X4CJ041255", 3, "Epson", "EcoTank L3250", 2, null, EstadoEquipo.EN_REPARACION, null, "Inyección de tinta, Color, USB", 2022);
 		ejemplo("BBJ-0020", "MJ0B7R3A", 1, "Lenovo", "ThinkCentre M70s", 3, "Jorge Euan Can", op, "Windows 11", "Core i5-12400, 16 GB RAM, Windows 11", 2023);
 		ejemplo("BBJ-0021", "MJ0B7R3F", 1, "Lenovo", "ThinkCentre M70s", 3, "Patricia Chi Balam", op, "Windows 11", "Core i5-12400, 16 GB RAM, Windows 11", 2023);

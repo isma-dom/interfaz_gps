@@ -1,5 +1,7 @@
 package mx.tecnologiccorp.sigit.inventario;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +20,11 @@ import mx.tecnologiccorp.sigit.catalogos.Marca;
 import mx.tecnologiccorp.sigit.catalogos.MarcaRepository;
 import mx.tecnologiccorp.sigit.catalogos.TipoEquipo;
 import mx.tecnologiccorp.sigit.catalogos.TipoEquipoRepository;
+import mx.tecnologiccorp.sigit.seguridad.Usuario;
+import mx.tecnologiccorp.sigit.seguridad.UsuarioRepository;
 
 /**
- * C-12. Alta, consulta y edición de equipos (RF-02). Los formatos los valida EquipoForm; aquí van las reglas que consultan
+ * C-12. Alta, consulta, edición y baja de equipos (RF-02). Los formatos los valida EquipoForm; aquí van las reglas que consultan
  * la base de datos: números únicos (RN-01) y catálogos existentes. La base de datos tiene además sus
  * propias restricciones (únicos, llaves foráneas y CHECK) por si dos altas llegan al mismo tiempo.
  */
@@ -35,12 +39,21 @@ public class EquipoService {
 
 	private final AreaRepository areas;
 
+	private final MovimientoRepository movimientos;
+
+	private final UsuarioRepository usuarios;
+
+	private final Clock reloj;
+
 	public EquipoService(EquipoRepository equipos, TipoEquipoRepository tipos, MarcaRepository marcas,
-			AreaRepository areas) {
+			AreaRepository areas, MovimientoRepository movimientos, UsuarioRepository usuarios, Clock reloj) {
 		this.equipos = equipos;
 		this.tipos = tipos;
 		this.marcas = marcas;
 		this.areas = areas;
+		this.movimientos = movimientos;
+		this.usuarios = usuarios;
+		this.reloj = reloj;
 	}
 
 	/**
@@ -69,13 +82,62 @@ public class EquipoService {
 		return errores;
 	}
 
+	/** Alta (Tarea 2). Deja el movimiento de alta en el historial, con quién lo registró. */
 	@Transactional
-	public Equipo registrar(EquipoForm formulario) {
+	public Equipo registrar(EquipoForm formulario, Long usuarioId) {
 		Catalogos c = catalogos(formulario, duplicados(formulario));
 		Equipo equipo = Equipo.nuevo(formulario.getNumInventario(), formulario.getNumSerie(), formulario.getNombre(),
 				c.tipo(), c.marca(), formulario.getModelo(), c.area());
 		copiarDetalles(equipo, c.tipo(), formulario);
-		return equipos.save(equipo);
+		Equipo guardado = equipos.save(equipo);
+		movimientos.save(Movimiento.alta(guardado, usuario(usuarioId), ahora()));
+		return guardado;
+	}
+
+	/**
+	 * Baja (Tarea 4, RN-04). Solo un equipo Candidato a baja o en Revisión pendiente pasa a Baja (AD
+	 * 2.2.3), con motivo por escrito. El equipo no se borra: cambia de estado, conserva todos sus datos y
+	 * la baja queda en su historial con quién la registró y cuándo.
+	 */
+	@Transactional
+	public EquipoDadoDeBaja darDeBaja(Long id, String motivo, Long version, Long usuarioId) {
+		Equipo equipo = equipos.findById(id).orElseThrow(() -> new EquipoNoEncontrado(id));
+		if (version == null || version != equipo.getVersion()) {
+			throw BajaNoPermitida.simultanea();
+		}
+		if (!equipo.getEstado().admiteBaja()) {
+			throw BajaNoPermitida.porEstado(equipo.getEstado());
+		}
+		String justificacion = motivo == null ? "" : motivo.trim();
+		if (justificacion.length() < 10) {
+			throw BajaNoPermitida.sinMotivo();
+		}
+		EstadoEquipo anterior = equipo.getEstado();
+		equipo.cambiarEstado(EstadoEquipo.BAJA);
+		// Si otra transacción lo modificó entre la lectura y este punto, @Version lo rechaza aquí.
+		equipos.saveAndFlush(equipo);
+		Movimiento baja = movimientos.save(Movimiento.baja(equipo, usuario(usuarioId), anterior, justificacion, ahora()));
+		return new EquipoDadoDeBaja(equipo.getNumInventario(), anterior, justificacion, baja.getFecha());
+	}
+
+	/** Historial del equipo, del movimiento más reciente al más antiguo. */
+	@Transactional(readOnly = true)
+	public List<Movimiento> historial(Long equipoId) {
+		return movimientos.findByEquipoIdOrderByFechaDescIdDesc(equipoId);
+	}
+
+	/** El movimiento de baja de un equipo dado de baja: quién, cuándo y por qué. */
+	@Transactional(readOnly = true)
+	public Optional<Movimiento> movimientoDeBaja(Long equipoId) {
+		return movimientos.findFirstByEquipoIdAndTipoOrderByFechaDescIdDesc(equipoId, TipoMovimiento.BAJA);
+	}
+
+	private Usuario usuario(Long usuarioId) {
+		return usuarioId == null ? null : usuarios.findById(usuarioId).orElse(null);
+	}
+
+	private LocalDateTime ahora() {
+		return LocalDateTime.now(reloj);
 	}
 
 	/**
@@ -155,6 +217,13 @@ public class EquipoService {
 	@Transactional(readOnly = true)
 	public long total() {
 		return equipos.count();
+	}
+
+	/** Equipos dados de baja, de todas las áreas o de una sola (rol Consulta). */
+	@Transactional(readOnly = true)
+	public long totalDadosDeBaja(Long areaId) {
+		return areaId == null ? equipos.countByEstado(EstadoEquipo.BAJA)
+				: equipos.countByEstadoAndAreaId(EstadoEquipo.BAJA, areaId);
 	}
 
 	@Transactional(readOnly = true)

@@ -56,8 +56,10 @@
             <div class="filtros__campo">
                 <label class="visually-hidden" for="estado">Estado</label>
                 <select class="form-select" id="estado" name="estado">
-                    <option value="">Cualquier estado</option>
-                    <option th:each="s : ${estados}" th:value="${s}" th:text="${s.etiqueta}" th:selected="${filtro.estado == s}">Estado</option>
+                    <option value="" th:selected="${filtro.estadoElegido() == null}">Equipos activos</option>
+                    <option th:each="s : ${estadosActivos}" th:value="${s}" th:text="${s.etiqueta}" th:selected="${filtro.estado == s}">Estado</option>
+                    <option value="BAJA" th:selected="${filtro.estadoElegido() == 'BAJA'}">Dados de baja</option>
+                    <option value="TODOS" th:selected="${filtro.conBajas}">Todos, con bajas</option>
                 </select>
             </div>
             <div class="filtros__campo">
@@ -76,6 +78,13 @@
            th:text="${equipos.totalElements == 1} ? 'Se encontró 1 equipo'
                     : |Mostrando ${equipos.number * equipos.size + 1} a ${equipos.number * equipos.size + equipos.numberOfElements} de ${equipos.totalElements} equipos|">
             Mostrando equipos
+        </p>
+
+        <!--/* Tarea 4: los dados de baja no cuentan como activos, pero se pueden consultar. */-->
+        <p class="nota-bajas" th:if="${filtro.estadoElegido() == null and totalBajas > 0}">
+            <i class="bi bi-archive" aria-hidden="true"></i>
+            <span th:text="${totalBajas == 1} ? 'No se muestra 1 equipo dado de baja.' : |No se muestran ${totalBajas} equipos dados de baja.|">No se muestran los dados de baja.</span>
+            <a th:href="@{/equipos(q=${filtro.texto},area=${areaFija == null ? filtro.areaId : null},tipo=${filtro.tipoId},estado='BAJA',orden=${filtro.orden})}">Ver dados de baja</a>
         </p>
 
         <div class="superficie estado-vacio" th:if="${equipos.empty}">
@@ -138,6 +147,11 @@
                            th:aria-label="|Editar ${e.numInventario}|" title="Editar">
                             <i class="bi bi-pencil-square" aria-hidden="true"></i><span class="etiqueta-accion" aria-hidden="true">Editar</span>
                         </a>
+                        <a class="btn btn-icono btn-icono--peligro" th:if="${puedeEditar and e.estado.admiteBaja()}"
+                           th:href="@{/equipos/{id}/baja(id=${e.id})}"
+                           th:aria-label="|Dar de baja ${e.numInventario}|" title="Dar de baja">
+                            <i class="bi bi-dash-circle" aria-hidden="true"></i><span class="etiqueta-accion" aria-hidden="true">Dar de baja</span>
+                        </a>
                     </td>
                 </tr>
                 </tbody>
@@ -148,15 +162,15 @@
              th:with="area=${areaFija == null ? filtro.areaId : null}">
             <ul class="pagination flex-wrap mb-0">
                 <li class="page-item" th:classappend="${equipos.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{/equipos(q=${filtro.texto},area=${area},tipo=${filtro.tipoId},estado=${filtro.estado},orden=${filtro.orden},pagina=${equipos.number})}">Anterior</a>
+                    <a class="page-link" th:href="@{/equipos(q=${filtro.texto},area=${area},tipo=${filtro.tipoId},estado=${filtro.estadoElegido()},orden=${filtro.orden},pagina=${equipos.number})}">Anterior</a>
                 </li>
                 <li class="page-item" th:each="i : ${#numbers.sequence(paginaDesde, paginaHasta)}"
                     th:classappend="${i == equipos.number + 1} ? 'active'">
-                    <a class="page-link" th:href="@{/equipos(q=${filtro.texto},area=${area},tipo=${filtro.tipoId},estado=${filtro.estado},orden=${filtro.orden},pagina=${i})}"
+                    <a class="page-link" th:href="@{/equipos(q=${filtro.texto},area=${area},tipo=${filtro.tipoId},estado=${filtro.estadoElegido()},orden=${filtro.orden},pagina=${i})}"
                        th:text="${i}" th:aria-current="${i == equipos.number + 1} ? 'page'">1</a>
                 </li>
                 <li class="page-item" th:classappend="${equipos.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{/equipos(q=${filtro.texto},area=${area},tipo=${filtro.tipoId},estado=${filtro.estado},orden=${filtro.orden},pagina=${equipos.number + 2})}">Siguiente</a>
+                    <a class="page-link" th:href="@{/equipos(q=${filtro.texto},area=${area},tipo=${filtro.tipoId},estado=${filtro.estadoElegido()},orden=${filtro.orden},pagina=${equipos.number + 2})}">Siguiente</a>
                 </li>
             </ul>
         </nav>

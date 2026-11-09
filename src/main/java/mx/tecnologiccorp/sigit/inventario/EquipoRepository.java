@@ -1,5 +1,7 @@
 package mx.tecnologiccorp.sigit.inventario;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,5 +19,11 @@ public interface EquipoRepository extends JpaRepository<Equipo, Long>, JpaSpecif
 	boolean existsByNumSerieAndIdNot(String numSerie, Long id);
 
 	Optional<Equipo> findByNumInventario(String numInventario);
+
+	List<Equipo> findByEstadoIn(Collection<EstadoEquipo> estados);
+
+	long countByEstado(EstadoEquipo estado);
+
+	long countByEstadoAndAreaId(EstadoEquipo estado, Long areaId);
 
 }

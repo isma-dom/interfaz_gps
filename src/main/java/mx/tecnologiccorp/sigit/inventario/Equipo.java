@@ -131,6 +131,14 @@ public class Equipo {
 		this.area = area;
 	}
 
+	/**
+	 * Cambio de estado. Solo lo usa EquipoService, que aplica la máquina de estados (AD 2.2.3) y
+	 * registra el movimiento correspondiente.
+	 */
+	void cambiarEstado(EstadoEquipo nuevo) {
+		this.estado = nuevo;
+	}
+
 	public void setCaracteristicas(Map<String, Object> caracteristicas) {
 		this.caracteristicas = new LinkedHashMap<>(caracteristicas);
 	}

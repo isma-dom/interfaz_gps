@@ -1619,7 +1619,16 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     }
 
     .tabla-equipos td[data-etiqueta="Ubicación"] {
-        min-width: 9rem;
+        min-width: 8.5rem;
+    }
+
+    /* Hasta tres acciones (ver, editar, dar de baja): más angostas, con la misma altura táctil. */
+    .tabla-equipos .tabla-equipos__acciones {
+        white-space: nowrap;
+    }
+
+    .tabla-equipos .tabla-equipos__acciones .btn-icono {
+        width: 2.25rem;
     }
 }
 
@@ -1646,4 +1655,156 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
         font-size: .9375rem;
         font-weight: 600;
     }
+}
+
+/* ---------- Tarea 4: baja de equipos ---------- */
+
+/* Confirmación: el aviso de que la baja es definitiva va antes que todo lo demás. */
+.confirmacion-baja__aviso {
+    display: flex;
+    gap: .875rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: .75rem;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #7f1d1d;
+}
+
+.confirmacion-baja__aviso > .bi {
+    font-size: 1.375rem;
+    color: var(--sigit-rojo);
+}
+
+.confirmacion-baja__aviso h2 {
+    margin-bottom: .375rem;
+    color: #7f1d1d;
+}
+
+.confirmacion-baja__casilla {
+    margin-top: 1.25rem;
+    padding: .875rem 1rem .875rem 2.75rem;
+    border-radius: .625rem;
+    background: #f8fafc;
+}
+
+.confirmacion-baja__casilla .form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-top: .125rem;
+}
+
+.cambio-estado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+}
+
+/* Ficha de un equipo dado de baja: se conserva, con cuándo, quién y por qué. */
+.aviso-baja {
+    display: flex;
+    gap: .75rem;
+    max-width: 56rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: .75rem;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    box-shadow: inset 4px 0 0 #b91c1c;
+}
+
+.aviso-baja > .bi {
+    font-size: 1.25rem;
+    color: #475569;
+}
+
+/* El listado avisa que los dados de baja existen, aunque no se muestren como activos. */
+.nota-bajas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .375rem .5rem;
+    margin: -.5rem 0 1rem;
+    color: var(--sigit-texto-suave);
+    font-size: .9375rem;
+}
+
+/* Historial de movimientos: una línea de tiempo vertical, del más reciente al más antiguo. */
+.historial-equipo {
+    margin-top: 1.5rem;
+}
+
+.historial-equipo .titulo-seccion {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+
+.historial-equipo__lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.historial-equipo__movimiento {
+    position: relative;
+    padding: 0 0 1.25rem 1.5rem;
+    border-left: 2px solid var(--sigit-borde);
+    margin-left: .375rem;
+}
+
+.historial-equipo__movimiento:last-child {
+    padding-bottom: 0;
+    border-left-color: transparent;
+}
+
+.historial-equipo__movimiento::before {
+    content: "";
+    position: absolute;
+    left: -.4375rem;
+    top: .3125rem;
+    width: .75rem;
+    height: .75rem;
+    border-radius: 50%;
+    background: var(--sigit-azul);
+}
+
+.historial-equipo__movimiento--baja::before {
+    background: var(--sigit-rojo);
+}
+
+.historial-equipo__encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem .75rem;
+    align-items: baseline;
+}
+
+.historial-equipo__fecha,
+.historial-equipo__quien {
+    color: var(--sigit-texto-suave);
+    font-size: .875rem;
+}
+
+.historial-equipo__estados {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .375rem;
+    font-size: .9375rem;
+}
+
+.historial-equipo__motivo {
+    margin: .25rem 0 0;
+    font-size: .9375rem;
+}
+
+.historial-equipo__quien {
+    margin: .125rem 0 0;
 }

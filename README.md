@@ -41,6 +41,13 @@ El Administrador registra equipos en Equipos → Nuevo equipo (http://localhost:
 - **Edición** (`/equipos/{id}/editar`, solo Administrador): las mismas reglas que el alta. El estado y el código QR no se editan ahí, y un equipo dado de baja ya no admite cambios. Al guardar, la ficha confirma qué datos cambiaron y los marca.
 - **Edición simultánea**: la columna `equipos.version` (migración `V3__edicion_equipos.sql`) evita que alguien sobrescriba sin darse cuenta los cambios que otra persona guardó mientras editaba.
 
+## Baja de equipos (Tarea 4)
+
+- **Quién y cuándo**: solo el Administrador, y solo para equipos Candidato a baja o en Revisión pendiente (máquina de estados de AD 2.2.3). Desde la ficha, «Dar de baja» abre una página de confirmación (`/equipos/{id}/baja`) que pide el motivo por escrito y marcar que la baja es definitiva (RN-04).
+- **Qué guarda**: el equipo pasa a estado `baja` (no se borra) y la tabla `movimientos` (migración `V4__movimientos.sql`) registra quién, cuándo, el estado anterior y el motivo. El alta también deja su movimiento.
+- **Después**: el equipo deja de aparecer en el listado de activos; se consulta con el filtro «Dados de baja», su ficha conserva todos los datos con su historial y ya no admite cambios.
+- **Candidatos a baja (RN-06)**: `ClasificadorDeObsolescencia` corre al arrancar y cada día a las 2:00. Pasa a Candidato a baja los equipos Operativos o Inactivos con 5 años o más de antigüedad o con un sistema operativo sin soporte (`sigit.obsolescencia.*` en `application.properties`).
+
 ## Prototipo de equipos (Tarea 1)
 
 Con el perfil `dev` existe un prototipo navegable de las pantallas P-03 (listado) y P-05 (registro y edición) de equipos, con 26 equipos de ejemplo en memoria: http://localhost:8080/prototipos/equipos. Registrar, editar y dar de baja es solo del Administrador; Consulta ve únicamente su área. Los equipos se pierden al reiniciar: guardarlos en MySQL es una tarea posterior.
@@ -120,7 +127,8 @@ Los documentos del proyecto no definen estos puntos:
 - Rutas web de las pantallas; el diseño solo define las de la API.
 - Aviso de sesión 2 minutos antes de expirar, con el botón «Seguir conectado».
 - Un administrador no puede desactivarse ni quitarse el rol, y el sistema no puede quedarse sin administradores activos.
-- Columnas que no están en el diccionario de datos: `equipos.nombre` (Tarea 2), `tipos_equipo.grupo_tecnico` (Tarea 2) y `equipos.version` (Tarea 3).
+- Columnas que no están en el diccionario de datos: `equipos.nombre` (Tarea 2), `tipos_equipo.grupo_tecnico` (Tarea 2) y `equipos.version` (Tarea 3). En `movimientos`, `usuario_id` admite nulo para la clasificación automática y para las altas anteriores a la tabla (Tarea 4).
+- Los parámetros de obsolescencia viven en `application.properties` hasta que exista la tabla `parametros` y su pantalla.
 - La edición de equipos todavía no deja rastro en la bitácora: se agrega con la Bitácora (Sprint 4).
 - El bloqueo de cuentas vive en memoria: un reinicio del servidor lo levanta.
 

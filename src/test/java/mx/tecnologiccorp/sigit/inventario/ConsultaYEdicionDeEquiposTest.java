@@ -100,7 +100,7 @@ class ConsultaYEdicionDeEquiposTest extends PruebaIntegracion {
 	private Equipo registrar(String inventario, String serie, String... cambios) {
 		EquipoForm formulario = new EquipoForm();
 		datos(inventario, serie, cambios).forEach((campo, valor) -> asignar(formulario, campo, valor));
-		return servicio.registrar(formulario);
+		return servicio.registrar(formulario, administrador.getId());
 	}
 
 	private static void asignar(EquipoForm f, String campo, String valor) {

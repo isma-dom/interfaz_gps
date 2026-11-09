@@ -6,6 +6,9 @@
     <a class="btn btn-outline-secondary" th:href="@{/equipos}">
         <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al listado
     </a>
+    <a class="btn btn-outline-danger" th:href="@{/equipos/{id}/baja(id=${e.id})}" th:if="${puedeDarDeBaja}">
+        <i class="bi bi-dash-circle" aria-hidden="true"></i> Dar de baja
+    </a>
     <a class="btn btn-primary" th:href="@{/equipos/{id}/editar(id=${e.id})}" th:if="${puedeEditar}">
         <i class="bi bi-pencil-square" aria-hidden="true"></i> Editar
     </a>
@@ -27,6 +30,33 @@
             Abajo están marcados con «Actualizado».
         </p>
         <p class="mb-0" th:if="${actualizado.sinCambios()}">Los datos son los mismos que ya estaban guardados.</p>
+    </div>
+
+    <!--/* Tarea 4: confirmación de que la baja se registró. */-->
+    <div class="resumen-registro" role="status" th:if="${dadoDeBaja != null}">
+        <h2 class="h5 mb-2">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span th:text="|Se dio de baja el equipo ${dadoDeBaja.numInventario}|">Se dio de baja el equipo</span>
+        </h2>
+        <p class="mb-1">
+            Pasó de <strong th:text="${dadoDeBaja.estadoAnterior.etiqueta}">Candidato a baja</strong> a <strong>Baja</strong>
+            el <span th:text="${#temporals.format(dadoDeBaja.fecha, 'dd/MM/yyyy')}">fecha</span>
+            a las <span th:text="${#temporals.format(dadoDeBaja.fecha, 'HH:mm')}">hora</span>.
+            Motivo: <span th:text="${dadoDeBaja.motivo}">motivo</span>
+        </p>
+        <p class="mb-0">Ya no aparece entre los equipos activos. Sus datos y su historial se conservan aquí.</p>
+    </div>
+
+    <!--/* Un equipo dado de baja conserva su ficha: se dice cuándo, quién y por qué. */-->
+    <div class="aviso-baja" th:if="${baja != null and dadoDeBaja == null}">
+        <i class="bi bi-archive" aria-hidden="true"></i>
+        <p class="mb-0">
+            <strong>Equipo dado de baja</strong>
+            el <span th:text="${#temporals.format(baja.fecha, 'dd/MM/yyyy HH:mm')}">fecha</span>
+            <th:block th:if="${baja.usuario != null}">por <span th:text="${baja.usuario.nombre}">usuario</span></th:block>.
+            Motivo: <span th:text="${baja.motivo}">motivo</span>
+            Se conserva para consulta; ya no admite cambios.
+        </p>
     </div>
 
     <article class="tarjeta-formulario ficha-equipo">
@@ -83,6 +113,32 @@
             <span>Responsable: sin resguardo</span>
         </footer>
     </article>
+
+    <!--/* Historial de movimientos (tabla movimientos): alta, cambios de estado y baja. */-->
+    <section class="tarjeta-formulario historial-equipo" th:unless="${historial.isEmpty()}" aria-labelledby="titulo-historial">
+        <h2 class="titulo-seccion" id="titulo-historial">
+            <i class="bi bi-clock-history" aria-hidden="true"></i> Historial de movimientos
+        </h2>
+        <ol class="historial-equipo__lista">
+            <li th:each="m : ${historial}" class="historial-equipo__movimiento"
+                th:classappend="${m.tipo.name() == 'BAJA'} ? 'historial-equipo__movimiento--baja'">
+                <div class="historial-equipo__encabezado">
+                    <strong th:text="${m.tipo.etiqueta}">Alta</strong>
+                    <span class="historial-equipo__fecha" th:text="${#temporals.format(m.fecha, 'dd/MM/yyyy HH:mm')}">fecha</span>
+                </div>
+                <div class="historial-equipo__estados" th:if="${m.estadoNuevo != null}">
+                    <th:block th:if="${m.estadoAnterior != null}">
+                        <span th:text="${m.estadoAnterior.etiqueta}">Antes</span>
+                        <i class="bi bi-arrow-right" aria-hidden="true"></i><span class="visually-hidden">a</span>
+                    </th:block>
+                    <span th:text="${m.estadoNuevo.etiqueta}">Después</span>
+                </div>
+                <p class="historial-equipo__motivo" th:if="${m.motivo != null}" th:text="${m.motivo}">Motivo</p>
+                <p class="historial-equipo__quien"
+                   th:text="${m.usuario != null} ? |Registró: ${m.usuario.nombre}| : (${m.tipo.name() == 'ALTA'} ? 'Registro anterior al historial' : 'Registró: SIGIT (automático)')">Registró</p>
+            </li>
+        </ol>
+    </section>
 
     <!--/* Un dato de la ficha. Lo vacío se dice con palabras; lo que cambió en la última edición se marca. */-->
     <th:block th:if="false">

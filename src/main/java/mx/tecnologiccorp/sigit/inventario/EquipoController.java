@@ -1,5 +1,7 @@
 package mx.tecnologiccorp.sigit.inventario;
 
+import java.util.Arrays;
+
 import jakarta.validation.Valid;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -53,7 +55,7 @@ public class EquipoController {
 	public String listado(@RequestParam(name = "q", required = false) String q,
 			@RequestParam(name = "area", required = false) Long areaId,
 			@RequestParam(name = "tipo", required = false) Long tipoId,
-			@RequestParam(name = "estado", required = false) EstadoEquipo estado,
+			@RequestParam(name = "estado", required = false) String estado,
 			@RequestParam(name = "orden", required = false) String orden,
 			@RequestParam(name = "pagina", defaultValue = "1") int pagina,
 			@AuthenticationPrincipal UsuarioSesion usuario, Model modelo) {
@@ -62,7 +64,7 @@ public class EquipoController {
 			areaFija = areaDe(usuario);
 			areaId = areaFija == null ? SIN_AREA : areaFija.getId();
 		}
-		FiltroEquipos filtro = new FiltroEquipos(q, areaId, tipoId, estado, orden);
+		FiltroEquipos filtro = FiltroEquipos.de(q, areaId, tipoId, estado, orden);
 		Page<FilaEquipo> equipos = servicio.buscar(filtro, pagina - 1).map(FilaEquipo::de);
 		modelo.addAttribute("equipos", equipos);
 		// Con miles de equipos no caben todos los números: se muestran hasta cinco alrededor de la actual.
@@ -75,7 +77,9 @@ public class EquipoController {
 		modelo.addAttribute("totalInventario", servicio.total());
 		modelo.addAttribute("areas", servicio.areas());
 		modelo.addAttribute("tipos", servicio.tipos());
-		modelo.addAttribute("estados", EstadoEquipo.values());
+		modelo.addAttribute("estadosActivos",
+				Arrays.stream(EstadoEquipo.values()).filter(e -> e != EstadoEquipo.BAJA).toList());
+		modelo.addAttribute("totalBajas", servicio.totalDadosDeBaja(areaFija == null ? null : areaId));
 		modelo.addAttribute("puedeEditar", usuario.tieneRol(Rol.ADMINISTRADOR));
 		return "equipos/listado";
 	}
@@ -87,8 +91,13 @@ public class EquipoController {
 		modelo.addAttribute("e", equipo);
 		modelo.addAttribute("caracteristicas", FichaEquipo.caracteristicas(equipo));
 		modelo.addAttribute("costo", FichaEquipo.costo(equipo.getCosto()));
-		modelo.addAttribute("puedeEditar",
-				usuario.tieneRol(Rol.ADMINISTRADOR) && equipo.getEstado() != EstadoEquipo.BAJA);
+		boolean administrador = usuario.tieneRol(Rol.ADMINISTRADOR);
+		modelo.addAttribute("puedeEditar", administrador && equipo.getEstado() != EstadoEquipo.BAJA);
+		modelo.addAttribute("puedeDarDeBaja", administrador && equipo.getEstado().admiteBaja());
+		modelo.addAttribute("historial", servicio.historial(id));
+		if (equipo.getEstado() == EstadoEquipo.BAJA) {
+			modelo.addAttribute("baja", servicio.movimientoDeBaja(id).orElse(null));
+		}
 		return "equipos/detalle";
 	}
 
@@ -102,12 +111,12 @@ public class EquipoController {
 
 	@PostMapping
 	public String registrar(@Valid @ModelAttribute("equipo") EquipoForm formulario, BindingResult resultado,
-			@RequestParam(name = "otro", required = false) String otro, Model modelo,
-			RedirectAttributes redireccion) {
+			@RequestParam(name = "otro", required = false) String otro,
+			@AuthenticationPrincipal UsuarioSesion usuario, Model modelo, RedirectAttributes redireccion) {
 		marcarDuplicados(formulario, null, resultado);
 		if (!resultado.hasErrors()) {
 			try {
-				Equipo equipo = servicio.registrar(formulario);
+				Equipo equipo = servicio.registrar(formulario, usuario.id());
 				// La confirmación muestra qué se guardó (ver equipos/resumen.html).
 				redireccion.addFlashAttribute("registrado", EquipoRegistrado.de(equipo));
 				if (otro != null) {
@@ -167,6 +176,47 @@ public class EquipoController {
 		}
 		modelo.addAttribute("existente", existente);
 		return formulario(modelo, formulario, "equipos/edicion");
+	}
+
+	/**
+	 * Baja (Tarea 4, RN-04): primero una página que pide confirmación, con los datos del equipo, el motivo
+	 * por escrito y la casilla de que es definitiva. Solo para Candidato a baja o Revisión pendiente.
+	 */
+	@GetMapping("/{id}/baja")
+	public String confirmarBaja(@PathVariable Long id, Model modelo, RedirectAttributes redireccion) {
+		Equipo equipo = servicio.consultar(id).orElseThrow(() -> new EquipoNoEncontrado(id));
+		if (!equipo.getEstado().admiteBaja()) {
+			redireccion.addFlashAttribute("error", BajaNoPermitida.porEstado(equipo.getEstado()).getMessage());
+			return "redirect:/equipos/" + id;
+		}
+		BajaForm formulario = new BajaForm();
+		formulario.setVersion(equipo.getVersion());
+		return vistaBaja(modelo, equipo, formulario);
+	}
+
+	@PostMapping("/{id}/baja")
+	public String darDeBaja(@PathVariable Long id, @Valid @ModelAttribute("baja") BajaForm formulario,
+			BindingResult resultado, @AuthenticationPrincipal UsuarioSesion usuario, Model modelo,
+			RedirectAttributes redireccion) {
+		Equipo equipo = servicio.consultar(id).orElseThrow(() -> new EquipoNoEncontrado(id));
+		if (resultado.hasErrors()) {
+			return vistaBaja(modelo, equipo, formulario);
+		}
+		try {
+			redireccion.addFlashAttribute("dadoDeBaja",
+					servicio.darDeBaja(id, formulario.getMotivo(), formulario.getVersion(), usuario.id()));
+		}
+		catch (BajaNoPermitida | ObjectOptimisticLockingFailureException rechazo) {
+			redireccion.addFlashAttribute("error", rechazo instanceof BajaNoPermitida ? rechazo.getMessage()
+					: BajaNoPermitida.simultanea().getMessage());
+		}
+		return "redirect:/equipos/" + id;
+	}
+
+	private String vistaBaja(Model modelo, Equipo equipo, BajaForm formulario) {
+		modelo.addAttribute("e", equipo);
+		modelo.addAttribute("baja", formulario);
+		return "equipos/baja";
 	}
 
 	/** Alguien más guardó primero: se muestran sus datos para no sobrescribirlos a ciegas. */

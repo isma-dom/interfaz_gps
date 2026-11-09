@@ -42,8 +42,10 @@ public class SeguridadConfig {
 		http.authorizeHttpRequests(reglas -> {
 				reglas.requestMatchers("/login", "/error", "/css/**", "/js/**", "/fuentes/**", "/webjars/**")
 					.permitAll();
-				// Registrar y editar equipos es solo del Administrador (RF-02); consultar es de todos los roles.
-				reglas.requestMatchers("/equipos/nuevo", "/equipos/*/editar").hasRole(Rol.ADMINISTRADOR);
+				// Registrar, editar y dar de baja equipos es solo del Administrador (RF-02, RN-04); consultar es
+				// de todos los roles.
+				reglas.requestMatchers("/equipos/nuevo", "/equipos/*/editar", "/equipos/*/baja")
+					.hasRole(Rol.ADMINISTRADOR);
 				reglas.requestMatchers(HttpMethod.POST, "/equipos", "/equipos/**").hasRole(Rol.ADMINISTRADOR);
 				// Prototipo de la Tarea 1 (solo perfil dev): registrar y editar equipos es del Administrador.
 				reglas.requestMatchers("/prototipos/equipos/nuevo", "/prototipos/equipos/*/editar")

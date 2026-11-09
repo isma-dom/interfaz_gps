@@ -44,6 +44,10 @@ final class BusquedaDeEquipos {
 			if (filtro.estado() != null) {
 				condiciones.add(cb.equal(raiz.get("estado"), filtro.estado()));
 			}
+			else if (!filtro.conBajas()) {
+				// Un equipo dado de baja deja de aparecer como activo (Tarea 4); sus datos siguen ahí.
+				condiciones.add(cb.notEqual(raiz.get("estado"), EstadoEquipo.BAJA));
+			}
 			return cb.and(condiciones.toArray(Predicate[]::new));
 		};
 	}

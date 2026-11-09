@@ -1480,6 +1480,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 /* En los formularios, el título y el botón de cerrar se alinean con la tarjeta. */
 .titulo-pagina:has(.tarjeta-formulario__cerrar) {
+    flex-wrap: nowrap;
     max-width: 56rem;
 }
 

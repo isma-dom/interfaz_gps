@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/pagina :: pagina(|Equipo ${e.numInventario}|, ~{::#acciones}, ~{::#cuerpo-pagina})}">
+<body>
+<div id="acciones" class="acciones-titulo acciones-ficha">
+    <a class="btn btn-outline-secondary" th:href="@{/equipos}">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i> Volver al listado
+    </a>
+    <a class="btn btn-primary" th:href="@{/equipos/{id}/editar(id=${e.id})}" th:if="${puedeEditar}">
+        <i class="bi bi-pencil-square" aria-hidden="true"></i> Editar
+    </a>
+</div>
+
+<!--/* Ficha del equipo (Tarea 3): toda su información, leída de MySQL en cada consulta. */-->
+<section id="cuerpo-pagina"
+         th:with="cambios=${actualizado != null ? actualizado.cambios : {}}">
+
+    <!--/* Confirmación de la edición: qué cambió. Los datos de abajo ya son los guardados. */-->
+    <div class="resumen-registro" role="status" th:if="${actualizado != null}">
+        <h2 class="h5 mb-2">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span th:text="${actualizado.sinCambios()} ? 'No había cambios que guardar' : |Se guardaron los cambios del equipo ${actualizado.numInventario}|">Cambios guardados</span>
+        </h2>
+        <p class="mb-0" th:unless="${actualizado.sinCambios()}">
+            <span th:text="${cambios.size() == 1} ? 'Cambió: ' : 'Cambiaron: '">Cambiaron: </span>
+            <strong th:text="${#strings.listJoin(cambios, ', ')}">Área</strong>.
+            Abajo están marcados con «Actualizado».
+        </p>
+        <p class="mb-0" th:if="${actualizado.sinCambios()}">Los datos son los mismos que ya estaban guardados.</p>
+    </div>
+
+    <article class="tarjeta-formulario ficha-equipo">
+        <section class="seccion-formulario">
+            <h2 class="titulo-seccion"><span class="numero-seccion" aria-hidden="true">1</span> Datos generales</h2>
+            <dl class="ficha-equipo__datos">
+                <div th:replace="~{equipos/detalle :: dato('Nombre del equipo', ${e.nombre}, ${cambios.contains('Nombre')})}"></div>
+                <div th:replace="~{equipos/detalle :: dato('Tipo', ${e.tipo.nombre}, ${cambios.contains('Tipo')})}"></div>
+                <div th:replace="~{equipos/detalle :: dato('Marca', ${e.marca.nombre}, ${cambios.contains('Marca')})}"></div>
+                <div th:replace="~{equipos/detalle :: dato('Modelo', ${e.modelo}, ${cambios.contains('Modelo')})}"></div>
+            </dl>
+        </section>
+
+        <section class="seccion-formulario">
+            <h2 class="titulo-seccion"><span class="numero-seccion" aria-hidden="true">2</span> Identificación y estado</h2>
+            <dl class="ficha-equipo__datos">
+                <div th:replace="~{equipos/detalle :: dato('Número de inventario', ${e.numInventario}, ${cambios.contains('Número de inventario')})}"></div>
+                <div th:replace="~{equipos/detalle :: dato('Número de serie', ${e.numSerie}, ${cambios.contains('Número de serie')})}"></div>
+                <div>
+                    <dt>Estado actual</dt>
+                    <dd>
+                        <span class="estado-equipo" th:classappend="|estado--${e.estado.clase}|">
+                            <i class="bi" th:classappend="|bi-${e.estado.icono}|" aria-hidden="true"></i>
+                            <span th:text="${e.estado.etiqueta}">Operativo</span>
+                        </span>
+                    </dd>
+                </div>
+                <div th:replace="~{equipos/detalle :: dato('Ubicación / área', ${e.area.detalle() == e.area.nombre ? e.area.nombre : e.area.nombre + ' (' + e.area.detalle() + ')'}, ${cambios.contains('Área')})}"></div>
+            </dl>
+        </section>
+
+        <section class="seccion-formulario">
+            <h2 class="titulo-seccion"><span class="numero-seccion" aria-hidden="true">3</span> Características técnicas</h2>
+            <dl class="ficha-equipo__datos" th:unless="${caracteristicas.isEmpty()}">
+                <th:block th:each="c : ${caracteristicas}">
+                    <div th:replace="~{equipos/detalle :: dato(${c.key}, ${c.value}, ${cambios.contains(c.key)})}"></div>
+                </th:block>
+            </dl>
+            <p class="ficha-equipo__vacio" th:if="${caracteristicas.isEmpty()}">No se capturaron características técnicas.</p>
+        </section>
+
+        <section class="seccion-formulario">
+            <h2 class="titulo-seccion"><span class="numero-seccion" aria-hidden="true">4</span> Detalles adicionales</h2>
+            <dl class="ficha-equipo__datos">
+                <div th:replace="~{equipos/detalle :: dato('Fecha de adquisición', ${e.fechaAdquisicion == null ? null : #temporals.format(e.fechaAdquisicion, 'dd/MM/yyyy')}, ${cambios.contains('Fecha de adquisición')})}"></div>
+                <div th:replace="~{equipos/detalle :: dato('Costo de adquisición', ${costo}, ${cambios.contains('Costo')})}"></div>
+                <div th:replace="~{equipos/detalle :: dato('Notas / observaciones', ${e.observaciones}, ${cambios.contains('Notas')})}"></div>
+            </dl>
+        </section>
+
+        <footer class="ficha-equipo__registro">
+            <span th:text="|Registrado el ${#temporals.format(e.createdAt, 'dd/MM/yyyy HH:mm')}|">Registrado</span>
+            <span th:text="|Última modificación: ${#temporals.format(e.updatedAt, 'dd/MM/yyyy HH:mm')}|">Modificado</span>
+            <span>Responsable: sin resguardo</span>
+        </footer>
+    </article>
+
+    <!--/* Un dato de la ficha. Lo vacío se dice con palabras; lo que cambió en la última edición se marca. */-->
+    <th:block th:if="false">
+        <div th:fragment="dato(etiqueta, valor, cambiado)" th:classappend="${cambiado} ? 'dato--cambiado'">
+            <dt>
+                <span th:text="${etiqueta}">Etiqueta</span>
+                <span class="marca-cambio" th:if="${cambiado}">Actualizado</span>
+            </dt>
+            <dd th:text="${valor ?: 'Sin capturar'}" th:classappend="${valor == null} ? 'dato--vacio'">Valor</dd>
+        </div>
+    </th:block>
+</section>
+</body>
+</html>

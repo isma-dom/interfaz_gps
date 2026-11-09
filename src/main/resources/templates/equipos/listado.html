@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/pagina :: pagina('Equipos', ~{::#acciones}, ~{::#cuerpo-pagina})}">
+<body>
+<a id="acciones" class="btn btn-primary btn-nuevo" th:href="@{/equipos/nuevo}" th:if="${puedeEditar}">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo equipo
+</a>
+
+<!--/* P-03 (Tarea 3): equipos registrados en MySQL, con búsqueda por datos de identificación y filtros. */-->
+<section id="cuerpo-pagina"
+         th:with="conFiltros=${filtro.activo() or (areaFija == null and filtro.areaId != null)}">
+    <th:block th:if="${registrado != null}"><div th:replace="~{equipos/resumen :: resumen}"></div></th:block>
+
+    <p class="aviso-area" th:if="${areaFija != null}">
+        <i class="bi bi-geo-alt" aria-hidden="true"></i>
+        <span>Ves los equipos de <strong th:text="${areaFija.nombre}">tu área</strong>, el área asignada a tu usuario.</span>
+    </p>
+
+    <div class="superficie estado-vacio" th:if="${consultaSinArea}">
+        <h2 class="h5">Tu usuario no tiene un área asignada</h2>
+        <p class="mb-0">Con el rol Consulta solo se ven los equipos de un área. Pide a Soporte Técnico que te asigne la tuya.</p>
+    </div>
+
+    <div class="superficie estado-vacio" th:if="${totalInventario == 0 and !consultaSinArea}">
+        <h2 class="h5">Todavía no hay equipos registrados</h2>
+        <p th:text="${puedeEditar} ? 'Registra el primer equipo para empezar el inventario.' : 'Cuando Soporte Técnico registre equipos, aparecerán aquí.'">
+            Registra el primer equipo.
+        </p>
+        <a class="btn btn-primary" th:href="@{/equipos/nuevo}" th:if="${puedeEditar}">Nuevo equipo</a>
+    </div>
+
+    <th:block th:if="${totalInventario > 0 and !consultaSinArea}">
+        <form class="filtros filtros-equipos" method="get" th:action="@{/equipos}" role="search">
+            <div class="filtros__busqueda">
+                <label class="visually-hidden" for="q">Buscar por inventario, serie, nombre o modelo</label>
+                <div class="campo-busqueda">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <input class="form-control" id="q" name="q" type="search" th:value="${filtro.texto}"
+                           placeholder="Inventario, serie, nombre…" title="Busca por número de inventario, número de serie, nombre o modelo" autocomplete="off" spellcheck="false">
+                </div>
+            </div>
+            <div class="filtros__campo" th:if="${areaFija == null}">
+                <label class="visually-hidden" for="area">Área</label>
+                <select class="form-select" id="area" name="area">
+                    <option value="">Todas las áreas</option>
+                    <option th:each="a : ${areas}" th:value="${a.id}" th:text="${a.nombre}" th:selected="${filtro.areaId == a.id}">Área</option>
+                </select>
+            </div>
+            <div class="filtros__campo">
+                <label class="visually-hidden" for="tipo">Tipo</label>
+                <select class="form-select" id="tipo" name="tipo">
+                    <option value="">Todos los tipos</option>
+                    <option th:each="t : ${tipos}" th:value="${t.id}" th:text="${t.nombre}" th:selected="${filtro.tipoId == t.id}">Tipo</option>
+                </select>
+            </div>
+            <div class="filtros__campo">
+                <label class="visually-hidden" for="estado">Estado</label>
+                <select class="form-select" id="estado" name="estado">
+                    <option value="">Cualquier estado</option>
+                    <option th:each="s : ${estados}" th:value="${s}" th:text="${s.etiqueta}" th:selected="${filtro.estado == s}">Estado</option>
+                </select>
+            </div>
+            <div class="filtros__campo">
+                <label class="visually-hidden" for="orden">Ordenar por</label>
+                <select class="form-select" id="orden" name="orden">
+                    <option value="" th:selected="${filtro.orden == null}">Por inventario</option>
+                    <option value="nombre" th:selected="${filtro.orden == 'nombre'}">Por nombre</option>
+                    <option value="recientes" th:selected="${filtro.orden == 'recientes'}">Más recientes</option>
+                </select>
+            </div>
+            <button class="btn btn-marino" type="submit">Buscar</button>
+            <a class="btn btn-link" th:href="@{/equipos}" th:if="${conFiltros}">Quitar filtros</a>
+        </form>
+
+        <p class="resumen-lista" th:unless="${equipos.empty}"
+           th:text="${equipos.totalElements == 1} ? 'Se encontró 1 equipo'
+                    : |Mostrando ${equipos.number * equipos.size + 1} a ${equipos.number * equipos.size + equipos.numberOfElements} de ${equipos.totalElements} equipos|">
+            Mostrando equipos
+        </p>
+
+        <div class="superficie estado-vacio" th:if="${equipos.empty}">
+            <h2 class="h5">Ningún equipo coincide con la búsqueda</h2>
+            <p class="mb-0">Revisa el número que escribiste, prueba solo con una parte de él o quita los filtros.</p>
+        </div>
+
+        <div class="tabla-marco" th:unless="${equipos.empty}">
+            <table class="table tabla-equipos">
+                <caption class="visually-hidden">Equipos del inventario</caption>
+                <thead>
+                <tr>
+                    <th scope="col">ID / Serie</th>
+                    <th scope="col">Nombre del equipo</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Marca y modelo</th>
+                    <th scope="col">Ubicación</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col" class="text-end">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${equipos}">
+                    <td class="tabla-equipos__inventario">
+                        <span class="tabla-equipos__numero" th:text="${e.numInventario}">BBJ-0001</span>
+                        <span class="tabla-equipos__detalle" th:text="${e.numSerie}">Serie</span>
+                    </td>
+                    <td data-etiqueta="Nombre">
+                        <div>
+                            <a class="tabla-equipos__nombre enlace-equipo" th:href="@{/equipos/{id}(id=${e.id})}" th:text="${e.nombre}">Nombre</a>
+                            <span class="tabla-equipos__detalle" th:if="${e.resumenTecnico}" th:text="${e.resumenTecnico}">Detalle</span>
+                        </div>
+                    </td>
+                    <td data-etiqueta="Tipo" th:text="${e.tipo}">Tipo</td>
+                    <td data-etiqueta="Marca">
+                        <div>
+                            <span class="d-block" th:text="${e.marca}">Marca</span>
+                            <span class="tabla-equipos__detalle" th:text="${e.modelo}">Modelo</span>
+                        </div>
+                    </td>
+                    <td data-etiqueta="Ubicación">
+                        <div>
+                            <span class="d-block" th:text="${e.area}">Área</span>
+                            <span class="tabla-equipos__detalle" th:text="${e.areaDetalle}">Edificio</span>
+                        </div>
+                    </td>
+                    <td data-etiqueta="Estado">
+                        <span class="estado-equipo" th:classappend="|estado--${e.estado.clase}|">
+                            <i class="bi" th:classappend="|bi-${e.estado.icono}|" aria-hidden="true"></i>
+                            <span th:text="${e.estado.etiqueta}">Estado</span>
+                        </span>
+                    </td>
+                    <td class="tabla-equipos__acciones">
+                        <a class="btn btn-icono" th:href="@{/equipos/{id}(id=${e.id})}"
+                           th:aria-label="|Ver ${e.numInventario}|" title="Ver ficha">
+                            <i class="bi bi-eye" aria-hidden="true"></i><span class="etiqueta-accion" aria-hidden="true">Ver ficha</span>
+                        </a>
+                        <a class="btn btn-icono" th:if="${puedeEditar and e.estado.name() != 'BAJA'}"
+                           th:href="@{/equipos/{id}/editar(id=${e.id})}"
+                           th:aria-label="|Editar ${e.numInventario}|" title="Editar">
+                            <i class="bi bi-pencil-square" aria-hidden="true"></i><span class="etiqueta-accion" aria-hidden="true">Editar</span>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="paginacion" aria-label="Páginas de equipos" th:if="${equipos.totalPages > 1}"
+             th:with="area=${areaFija == null ? filtro.areaId : null}">
+            <ul class="pagination flex-wrap mb-0">
+                <li class="page-item" th:classappend="${equipos.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/equipos(q=${filtro.texto},area=${area},tipo=${filtro.tipoId},estado=${filtro.estado},orden=${filtro.orden},pagina=${equipos.number})}">Anterior</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(paginaDesde, paginaHasta)}"
+                    th:classappend="${i == equipos.number + 1} ? 'active'">
+                    <a class="page-link" th:href="@{/equipos(q=${filtro.texto},area=${area},tipo=${filtro.tipoId},estado=${filtro.estado},orden=${filtro.orden},pagina=${i})}"
+                       th:text="${i}" th:aria-current="${i == equipos.number + 1} ? 'page'">1</a>
+                </li>
+                <li class="page-item" th:classappend="${equipos.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/equipos(q=${filtro.texto},area=${area},tipo=${filtro.tipoId},estado=${filtro.estado},orden=${filtro.orden},pagina=${equipos.number + 2})}">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+    </th:block>
+</section>
+</body>
+</html>

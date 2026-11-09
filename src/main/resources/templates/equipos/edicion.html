@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragmentos/pagina :: pagina(|Editar equipo ${existente.numInventario}|, ~{::#cerrar}, ~{::#cuerpo-pagina})}">
+<body>
+<a id="cerrar" class="tarjeta-formulario__cerrar" th:href="@{/equipos/{id}(id=${existente.id})}" aria-label="Cerrar sin guardar">
+    <i class="bi bi-x-lg" aria-hidden="true"></i>
+</a>
+
+<!--/* P-05 en modo edición (Tarea 3): mismos campos y reglas que el alta, guardando en MySQL. */-->
+<form id="cuerpo-pagina" method="post" th:action="@{/equipos/{id}(id=${existente.id})}" novalidate>
+    <div class="aviso aviso--error aviso--ancho" role="alert" th:if="${aviso}">
+        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+        <span th:text="${aviso}">Alguien más guardó cambios.</span>
+    </div>
+
+    <div class="tarjeta-formulario">
+        <p class="introduccion-formulario">
+            Cambia lo que haga falta y guarda. El estado y el código QR no se editan aquí: el estado cambia con un movimiento.
+        </p>
+        <!--/* Versión que se abrió: si alguien guarda antes, el sistema lo detecta y no sobrescribe. */-->
+        <input type="hidden" name="version" th:value="${equipo.version}">
+        <div th:replace="~{equipos/formulario :: campos('Guardar cambios', false, |/equipos/${existente.id}|)}"></div>
+    </div>
+</form>
+</body>
+</html>

@@ -32,7 +32,14 @@ Spring Boot levanta solo el MySQL de `compose.yaml`, aplica las migraciones y ab
 
 ## Alta de equipos (Tarea 2)
 
-El Administrador registra equipos en Equipos → Registrar equipo (http://localhost:8080/equipos/nuevo). Se guardan en la tabla `equipos` de MySQL, creada por la migración `V2__inventario.sql` con los catálogos iniciales de tipos y marcas. Antes del primer alta tiene que existir al menos un área.
+El Administrador registra equipos en Equipos → Nuevo equipo (http://localhost:8080/equipos/nuevo). Se guardan en la tabla `equipos` de MySQL, creada por la migración `V2__inventario.sql` con los catálogos iniciales de tipos y marcas. Antes del primer alta tiene que existir al menos un área.
+
+## Consulta y actualización de equipos (Tarea 3)
+
+- **Listado** (http://localhost:8080/equipos): todos los roles consultan los equipos guardados en MySQL, de 15 en 15. El buscador localiza un equipo por número de inventario, número de serie, nombre o modelo (sin importar mayúsculas ni acentos) o por el código QR completo; hay filtros por área, tipo y estado, y orden por inventario, nombre o fecha de registro. Consulta solo ve su área.
+- **Ficha** (`/equipos/{id}`): toda la información del equipo, con sus características técnicas.
+- **Edición** (`/equipos/{id}/editar`, solo Administrador): las mismas reglas que el alta. El estado y el código QR no se editan ahí, y un equipo dado de baja ya no admite cambios. Al guardar, la ficha confirma qué datos cambiaron y los marca.
+- **Edición simultánea**: la columna `equipos.version` (migración `V3__edicion_equipos.sql`) evita que alguien sobrescriba sin darse cuenta los cambios que otra persona guardó mientras editaba.
 
 ## Prototipo de equipos (Tarea 1)
 
@@ -113,6 +120,8 @@ Los documentos del proyecto no definen estos puntos:
 - Rutas web de las pantallas; el diseño solo define las de la API.
 - Aviso de sesión 2 minutos antes de expirar, con el botón «Seguir conectado».
 - Un administrador no puede desactivarse ni quitarse el rol, y el sistema no puede quedarse sin administradores activos.
+- Columnas que no están en el diccionario de datos: `equipos.nombre` (Tarea 2), `tipos_equipo.grupo_tecnico` (Tarea 2) y `equipos.version` (Tarea 3).
+- La edición de equipos todavía no deja rastro en la bitácora: se agrega con la Bitácora (Sprint 4).
 - El bloqueo de cuentas vive en memoria: un reinicio del servidor lo levanta.
 
 ## Pendiente fuera de este módulo

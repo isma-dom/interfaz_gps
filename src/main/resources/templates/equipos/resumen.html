@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/* Confirmación del registro exitoso (Tarea 2): qué se guardó. La usan el listado y el alta. */-->
+<div th:fragment="resumen" class="resumen-registro" role="status">
+    <h2 class="h5">
+        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+        <span th:text="|Se registró el equipo ${registrado.numInventario}|">Se registró el equipo</span>
+    </h2>
+    <dl class="resumen-registro__datos">
+        <div><dt>Nombre</dt><dd th:text="${registrado.nombre}">Nombre</dd></div>
+        <div><dt>Equipo</dt><dd th:text="|${registrado.tipo}, ${registrado.marcaYModelo}|">Tipo</dd></div>
+        <div><dt>Número de serie</dt><dd th:text="${registrado.numSerie}">Serie</dd></div>
+        <div><dt>Ubicación</dt><dd th:text="|${registrado.area}, ${registrado.areaDetalle}|">Área</dd></div>
+        <div>
+            <dt>Estado</dt>
+            <dd>
+                <span class="estado-equipo" th:classappend="|estado--${registrado.estado.clase}|">
+                    <i class="bi" th:classappend="|bi-${registrado.estado.icono}|" aria-hidden="true"></i>
+                    <span th:text="${registrado.estado.etiqueta}">Operativo</span>
+                </span>
+            </dd>
+        </div>
+        <div><dt>Registrado</dt><dd th:text="${#temporals.format(registrado.registrado, 'dd/MM/yyyy HH:mm')}">Fecha</dd></div>
+    </dl>
+    <p class="mb-0">Su código QR quedó asignado; la etiqueta se imprime desde el listado cuando esté disponible.</p>
+</div>
+</body>
+</html>

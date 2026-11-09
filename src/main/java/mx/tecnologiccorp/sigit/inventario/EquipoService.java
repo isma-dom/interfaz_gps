@@ -3,6 +3,11 @@ package mx.tecnologiccorp.sigit.inventario;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +20,7 @@ import mx.tecnologiccorp.sigit.catalogos.TipoEquipo;
 import mx.tecnologiccorp.sigit.catalogos.TipoEquipoRepository;
 
 /**
- * C-12. Alta de equipos (RF-02). Los formatos los valida EquipoForm; aquí van las reglas que consultan
+ * C-12. Alta, consulta y edición de equipos (RF-02). Los formatos los valida EquipoForm; aquí van las reglas que consultan
  * la base de datos: números únicos (RN-01) y catálogos existentes. La base de datos tiene además sus
  * propias restricciones (únicos, llaves foráneas y CHECK) por si dos altas llegan al mismo tiempo.
  */
@@ -44,11 +49,21 @@ public class EquipoService {
 	 */
 	@Transactional(readOnly = true)
 	public Map<String, String> duplicados(EquipoForm formulario) {
+		return duplicados(formulario, null);
+	}
+
+	/** Igual que en el alta, pero en la edición el equipo puede conservar sus propios números. */
+	@Transactional(readOnly = true)
+	public Map<String, String> duplicados(EquipoForm formulario, Long excepto) {
 		Map<String, String> errores = new LinkedHashMap<>();
-		if (formulario.getNumInventario() != null && equipos.existsByNumInventario(formulario.getNumInventario())) {
+		String inventario = formulario.getNumInventario();
+		if (inventario != null && (excepto == null ? equipos.existsByNumInventario(inventario)
+				: equipos.existsByNumInventarioAndIdNot(inventario, excepto))) {
 			errores.put("numInventario", "Ya existe un equipo con este número de inventario.");
 		}
-		if (formulario.getNumSerie() != null && equipos.existsByNumSerie(formulario.getNumSerie())) {
+		String serie = formulario.getNumSerie();
+		if (serie != null && (excepto == null ? equipos.existsByNumSerie(serie)
+				: equipos.existsByNumSerieAndIdNot(serie, excepto))) {
 			errores.put("numSerie", "Ya existe un equipo con este número de serie.");
 		}
 		return errores;
@@ -56,7 +71,61 @@ public class EquipoService {
 
 	@Transactional
 	public Equipo registrar(EquipoForm formulario) {
-		Map<String, String> errores = duplicados(formulario);
+		Catalogos c = catalogos(formulario, duplicados(formulario));
+		Equipo equipo = Equipo.nuevo(formulario.getNumInventario(), formulario.getNumSerie(), formulario.getNombre(),
+				c.tipo(), c.marca(), formulario.getModelo(), c.area());
+		copiarDetalles(equipo, c.tipo(), formulario);
+		return equipos.save(equipo);
+	}
+
+	/**
+	 * Edición (Tarea 3). Aplica las mismas reglas que el alta; el estado y el código QR no cambian. Rechaza
+	 * los equipos dados de baja (RN-04) y los que alguien más guardó después de abrir el formulario.
+	 */
+	@Transactional
+	public EquipoActualizado actualizar(Long id, EquipoForm formulario) {
+		Equipo equipo = equipos.findById(id).orElseThrow(() -> new EquipoNoEncontrado(id));
+		if (equipo.getEstado() == EstadoEquipo.BAJA) {
+			throw EdicionRechazada.dadoDeBaja();
+		}
+		if (formulario.getVersion() == null || formulario.getVersion() != equipo.getVersion()) {
+			throw EdicionRechazada.simultanea();
+		}
+		Catalogos c = catalogos(formulario, duplicados(formulario, id));
+		Map<String, String> antes = FichaEquipo.datosEditables(equipo);
+		equipo.actualizarDatosGenerales(formulario.getNumInventario(), formulario.getNumSerie(), formulario.getNombre(),
+				c.tipo(), c.marca(), formulario.getModelo(), c.area());
+		copiarDetalles(equipo, c.tipo(), formulario);
+		List<String> cambios = FichaEquipo.cambios(antes, FichaEquipo.datosEditables(equipo));
+		if (!cambios.isEmpty()) {
+			// Si otra transacción lo guardó entre la lectura y este punto, @Version lo rechaza aquí.
+			equipos.saveAndFlush(equipo);
+		}
+		return new EquipoActualizado(equipo.getId(), equipo.getNumInventario(), cambios);
+	}
+
+	/** Listado (P-03): búsqueda por datos de identificación, filtros y orden, de 15 en 15 en MySQL. */
+	@Transactional(readOnly = true)
+	public Page<Equipo> buscar(FiltroEquipos filtro, int pagina) {
+		Sort orden = switch (filtro.orden() == null ? "" : filtro.orden()) {
+			case "nombre" -> Sort.by("nombre", "numInventario");
+			case "recientes" -> Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"));
+			default -> Sort.by("numInventario");
+		};
+		return equipos.findAll(BusquedaDeEquipos.de(filtro),
+				PageRequest.of(Math.max(pagina, 0), FiltroEquipos.POR_PAGINA, orden));
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Equipo> consultar(Long id) {
+		return equipos.findById(id);
+	}
+
+	private record Catalogos(TipoEquipo tipo, Marca marca, Area area) {
+	}
+
+	/** Los catálogos elegidos deben existir; junta sus errores con los que ya traía la validación. */
+	private Catalogos catalogos(EquipoForm formulario, Map<String, String> errores) {
 		TipoEquipo tipo = tipos.findById(formulario.getTipoId()).orElse(null);
 		if (tipo == null) {
 			errores.put("tipoId", "Elige un tipo de equipo de la lista.");
@@ -72,15 +141,15 @@ public class EquipoService {
 		if (!errores.isEmpty()) {
 			throw new ErroresDeEquipo(errores);
 		}
+		return new Catalogos(tipo, marca, area);
+	}
 
-		Equipo equipo = Equipo.nuevo(formulario.getNumInventario(), formulario.getNumSerie(), formulario.getNombre(),
-				tipo, marca, formulario.getModelo(), area);
+	private static void copiarDetalles(Equipo equipo, TipoEquipo tipo, EquipoForm formulario) {
 		equipo.setCaracteristicas(caracteristicas(tipo.getGrupo(), formulario));
 		equipo.setSistemaOperativo(tipo.getGrupo() == GrupoTecnico.COMPUTO ? formulario.getSistemaOperativo() : null);
 		equipo.setFechaAdquisicion(formulario.getFechaAdquisicion());
 		equipo.setCosto(formulario.getCosto());
 		equipo.setObservaciones(formulario.getObservaciones());
-		return equipos.save(equipo);
 	}
 
 	@Transactional(readOnly = true)

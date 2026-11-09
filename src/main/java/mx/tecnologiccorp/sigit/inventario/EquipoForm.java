@@ -2,6 +2,7 @@ package mx.tecnologiccorp.sigit.inventario;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -12,6 +13,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * Campos de P-05 según el diccionario de datos (tabla equipos, AD 2.2.2), más el nombre que pide la
@@ -93,7 +96,9 @@ public class EquipoForm {
 	private Integer autonomiaMinutos;
 
 	// Adquisición
+	// El campo <input type="date"> envía y espera aaaa-mm-dd, no el formato corto de es-MX.
 	@PastOrPresent(message = "La fecha de adquisición no puede ser futura.")
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	private LocalDate fechaAdquisicion;
 
 	@DecimalMin(value = "0", message = "El costo no puede ser negativo.")
@@ -103,6 +108,55 @@ public class EquipoForm {
 	// Observaciones
 	@Size(max = 1000, message = "Las observaciones no deben tener más de 1000 caracteres.")
 	private String observaciones;
+
+	/** Versión del equipo que se abrió para editar (bloqueo optimista); vacía en el alta. */
+	private Long version;
+
+	/** Formulario de edición con los datos guardados, incluidas las características técnicas. */
+	public static EquipoForm de(Equipo equipo) {
+		EquipoForm f = new EquipoForm();
+		f.numInventario = equipo.getNumInventario();
+		f.numSerie = equipo.getNumSerie();
+		f.nombre = equipo.getNombre();
+		f.tipoId = equipo.getTipo().getId();
+		f.marcaId = equipo.getMarca().getId();
+		f.modelo = equipo.getModelo();
+		f.areaId = equipo.getArea().getId();
+		f.sistemaOperativo = equipo.getSistemaOperativo();
+		f.fechaAdquisicion = equipo.getFechaAdquisicion();
+		f.costo = equipo.getCosto();
+		f.observaciones = equipo.getObservaciones();
+		f.version = equipo.getVersion();
+		Map<String, Object> c = equipo.getCaracteristicas() == null ? Map.of() : equipo.getCaracteristicas();
+		f.procesador = texto(c.get("procesador"));
+		f.memoriaGb = entero(c.get("memoriaGb"));
+		f.almacenamientoGb = entero(c.get("almacenamientoGb"));
+		f.tipoAlmacenamiento = texto(c.get("tipoAlmacenamiento"));
+		f.tecnologiaImpresion = texto(c.get("tecnologia"));
+		f.impresionColor = logico(c.get("color"));
+		f.conexion = texto(c.get("conexion"));
+		f.puertos = entero(c.get("puertos"));
+		f.administrable = logico(c.get("administrable"));
+		f.direccionIp = texto(c.get("direccionIp"));
+		f.tamanoPulgadas = entero(c.get("tamanoPulgadas"));
+		f.resolucion = texto(c.get("resolucion"));
+		f.capacidadVa = entero(c.get("capacidadVa"));
+		f.autonomiaMinutos = entero(c.get("autonomiaMinutos"));
+		return f;
+	}
+
+	// El JSON de MySQL regresa los números como Integer o Long según su tamaño.
+	private static Integer entero(Object valor) {
+		return valor instanceof Number numero ? numero.intValue() : null;
+	}
+
+	private static String texto(Object valor) {
+		return valor == null ? null : valor.toString();
+	}
+
+	private static Boolean logico(Object valor) {
+		return valor instanceof Boolean logico ? logico : null;
+	}
 
 	/** Para «Registrar y agregar otro»: conserva lo que suele repetirse en un levantamiento. */
 	public EquipoForm copiaParaElSiguiente() {
@@ -185,5 +239,8 @@ public class EquipoForm {
 	public void setCosto(BigDecimal v) { costo = v; }
 	public String getObservaciones() { return observaciones; }
 	public void setObservaciones(String v) { observaciones = limpiar(v); }
+
+	public Long getVersion() { return version; }
+	public void setVersion(Long v) { version = v; }
 
 }

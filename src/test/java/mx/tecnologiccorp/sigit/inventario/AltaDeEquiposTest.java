@@ -144,7 +144,7 @@ class AltaDeEquiposTest extends PruebaIntegracion {
 			.andExpect(content().string(containsString("Se registró el equipo BBJ-0103")))
 			.andExpect(content().string(containsString("PC de préstamo 3")))
 			.andExpect(content().string(containsString("Sala de consulta")))
-			.andExpect(content().string(containsString("Hay 1 equipo registrado en el inventario.")));
+			.andExpect(content().string(containsString("Se encontró 1 equipo")));
 	}
 
 	@Test

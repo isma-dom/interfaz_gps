@@ -108,14 +108,18 @@
                         <span class="tabla-equipos__detalle" th:text="${e.numSerie}">Serie</span>
                     </td>
                     <td data-etiqueta="Nombre">
-                        <span class="tabla-equipos__nombre" th:text="${e.nombre()}">HP ProDesk</span>
-                        <span class="tabla-equipos__detalle" th:if="${e.resumenTecnico}" th:text="${e.resumenTecnico}">Detalle</span>
+                        <div>
+                            <span class="tabla-equipos__nombre" th:text="${e.nombre()}">HP ProDesk</span>
+                            <span class="tabla-equipos__detalle" th:if="${e.resumenTecnico}" th:text="${e.resumenTecnico}">Detalle</span>
+                        </div>
                     </td>
                     <td data-etiqueta="Tipo" th:text="${e.tipo.nombre}">Tipo</td>
                     <td data-etiqueta="Marca" th:text="${e.marca.nombre}">Marca</td>
                     <td data-etiqueta="Ubicación">
-                        <span class="d-block" th:text="${e.area.nombre}">Área</span>
-                        <span class="tabla-equipos__detalle" th:text="${e.area.detalle()}">Edificio</span>
+                        <div>
+                            <span class="d-block" th:text="${e.area.nombre}">Área</span>
+                            <span class="tabla-equipos__detalle" th:text="${e.area.detalle()}">Edificio</span>
+                        </div>
                     </td>
                     <td data-etiqueta="Estado">
                         <div>

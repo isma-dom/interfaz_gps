@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -94,6 +95,11 @@ public class Equipo {
 	@Column(name = "updated_at", nullable = false)
 	private LocalDateTime updatedAt;
 
+	/** Bloqueo optimista: cada guardado lo incrementa (Tarea 3). */
+	@Version
+	@Column(nullable = false)
+	private long version;
+
 	protected Equipo() {
 	}
 
@@ -111,6 +117,18 @@ public class Equipo {
 		equipo.estado = EstadoEquipo.OPERATIVO;
 		equipo.qrUuid = UUID.randomUUID().toString();
 		return equipo;
+	}
+
+	/** Edición (Tarea 3): el estado y el código QR no cambian aquí. */
+	public void actualizarDatosGenerales(String numInventario, String numSerie, String nombre, TipoEquipo tipo,
+			Marca marca, String modelo, Area area) {
+		this.numInventario = numInventario;
+		this.numSerie = numSerie;
+		this.nombre = nombre;
+		this.tipo = tipo;
+		this.marca = marca;
+		this.modelo = modelo;
+		this.area = area;
 	}
 
 	public void setCaracteristicas(Map<String, Object> caracteristicas) {
@@ -195,6 +213,14 @@ public class Equipo {
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
+	}
+
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public long getVersion() {
+		return version;
 	}
 
 }

@@ -8,7 +8,7 @@
 
 <!--/* P-05: alta real de equipos (Tarea 2), con el diseño de tarjeta y secciones numeradas. */-->
 <form id="cuerpo-pagina" method="post" th:action="@{/equipos}" novalidate>
-    <div th:if="${registrado != null}" th:insert="~{equipos/inicio :: resumen}"></div>
+    <th:block th:if="${registrado != null}"><div th:replace="~{equipos/resumen :: resumen}"></div></th:block>
 
     <div class="superficie estado-vacio" th:if="${areas.empty}">
         <h2 class="h5">Primero hace falta registrar las áreas</h2>

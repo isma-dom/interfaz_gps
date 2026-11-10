@@ -2,18 +2,15 @@ package mx.tecnologiccorp.sigit.qr;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.zxing.common.BitMatrix;
 
 import org.openpdf.text.Document;
 import org.openpdf.text.Element;
-import org.openpdf.text.Font;
 import org.openpdf.text.PageSize;
-import org.openpdf.text.Paragraph;
-import org.openpdf.text.Phrase;
 import org.openpdf.text.pdf.BaseFont;
-import org.openpdf.text.pdf.ColumnText;
 import org.openpdf.text.pdf.PdfContentByte;
 import org.openpdf.text.pdf.PdfWriter;
 import org.springframework.stereotype.Component;
@@ -35,6 +32,11 @@ public class EtiquetasPdf {
 	private static final int COLUMNAS = 3, FILAS = 8;
 
 	private static final float LADO_QR = 2.6f * CM;
+
+	/** Espacio para el número de inventario: hasta tres renglones de letra chica. */
+	private static final float ALTO_INVENTARIO = 0.9f * CM;
+
+	private static final float INTERLINEADO = 1.15f;
 
 	private static final Color GRIS = new Color(0x64, 0x74, 0x8b), GUIA = new Color(0xcb, 0xd5, 0xe1);
 
@@ -93,27 +95,111 @@ public class EtiquetasPdf {
 		}
 		lienzo.fill();
 
-		// Textos a la derecha del código.
+		// Textos a la derecha del código. Se acomodan midiendo cada renglón: nada se descarta en silencio.
 		float tx = qx + LADO_QR + 0.05f * CM, ancho = x + ANCHO - 0.15f * CM - tx;
-		ColumnText columna = new ColumnText(lienzo);
-		columna.setSimpleColumn(tx, y + 0.45f * CM, tx + ancho, y + ALTO - 0.3f * CM);
-		columna.addElement(parrafo("SIGIT", new Font(negrita, 6, Font.NORMAL, GRIS), 0));
-		columna.addElement(parrafo(equipo.getNumInventario(), new Font(negrita, 10.5f, Font.NORMAL, Color.BLACK), 2));
-		columna.addElement(parrafo(equipo.getArea().getNombre(), new Font(normal, 7, Font.NORMAL, Color.BLACK), 3));
-		columna.go();
-
-		ColumnText pie = new ColumnText(lienzo);
-		pie.setSimpleColumn(tx, y + 0.15f * CM, tx + ancho, y + 0.5f * CM);
-		pie.addElement(parrafo("Biblioteca Benito Juárez", new Font(normal, 5, Font.NORMAL, GRIS), 0));
-		pie.go();
+		float arriba = y + ALTO - 0.3f * CM, abajo = y + 0.55f * CM;
+		escribir(lienzo, List.of("SIGIT"), negrita, 6, GRIS, tx, arriba - 5);
+		float baseInventario = arriba - 8;
+		Bloque inventario = acomodar(equipo.getNumInventario(), negrita, ancho, ALTO_INVENTARIO, 10.5f, 5, false);
+		float siguiente = escribir(lienzo, inventario.renglones(), negrita, inventario.tamano(), Color.BLACK, tx,
+				baseInventario - inventario.tamano());
+		Bloque area = acomodar(equipo.getArea().getNombre(), normal, ancho, siguiente - 2 - abajo, 7, 5.5f, true);
+		escribir(lienzo, area.renglones(), normal, area.tamano(), Color.BLACK, tx, siguiente - 2 - area.tamano());
+		escribir(lienzo, List.of("Biblioteca Benito Juárez"), normal, 5, GRIS, tx, y + 0.22f * CM);
 	}
 
-	private static Paragraph parrafo(String texto, Font fuente, float espacioAntes) {
-		Paragraph parrafo = new Paragraph(new Phrase(texto, fuente));
-		parrafo.setLeading(fuente.getSize() * 1.15f);
-		parrafo.setSpacingBefore(espacioAntes);
-		parrafo.setAlignment(Element.ALIGN_LEFT);
-		return parrafo;
+	/** Renglones ya partidos y el tamaño de letra con el que caben. */
+	record Bloque(List<String> renglones, float tamano) {
+
+		float alto() {
+			return renglones.size() * tamano * INTERLINEADO;
+		}
+
+	}
+
+	/**
+	 * Acomoda un texto en una caja: prueba de {@code maximo} a {@code minimo} puntos, primero en un solo renglón y
+	 * luego partiéndolo. Si ni así cabe, {@code recortar} lo termina en «…»; si no, se queda completo al tamaño
+	 * mínimo (el número de inventario nunca se recorta).
+	 */
+	static Bloque acomodar(String texto, BaseFont fuente, float ancho, float alto, float maximo, float minimo,
+			boolean recortar) {
+		for (float t = maximo; t >= minimo; t -= 0.5f) {
+			if (fuente.getWidthPoint(texto, t) <= ancho && t * INTERLINEADO <= alto) {
+				return new Bloque(List.of(texto), t);
+			}
+		}
+		for (float t = maximo; t >= minimo; t -= 0.5f) {
+			Bloque bloque = new Bloque(partir(texto, fuente, t, ancho), t);
+			if (bloque.alto() <= alto) {
+				return bloque;
+			}
+		}
+		List<String> renglones = partir(texto, fuente, minimo, ancho);
+		if (!recortar) {
+			return new Bloque(renglones, minimo);
+		}
+		int caben = Math.max(1, (int) Math.floor(alto / (minimo * INTERLINEADO)));
+		if (renglones.size() <= caben) {
+			return new Bloque(renglones, minimo);
+		}
+		List<String> visibles = new ArrayList<>(renglones.subList(0, caben));
+		String ultimo = visibles.get(caben - 1).stripTrailing();
+		while (!ultimo.isEmpty() && fuente.getWidthPoint(ultimo + "…", minimo) > ancho) {
+			ultimo = ultimo.substring(0, ultimo.length() - 1).stripTrailing();
+		}
+		visibles.set(caben - 1, ultimo + "…");
+		return new Bloque(visibles, minimo);
+	}
+
+	/** Parte en palabras; una palabra más ancha que la caja se parte después de un guion o, si no hay, donde quepa. */
+	static List<String> partir(String texto, BaseFont fuente, float tamano, float ancho) {
+		List<String> renglones = new ArrayList<>();
+		StringBuilder actual = new StringBuilder();
+		for (String palabra : texto.trim().split("\\s+")) {
+			String candidato = actual.isEmpty() ? palabra : actual + " " + palabra;
+			if (fuente.getWidthPoint(candidato, tamano) <= ancho) {
+				actual = new StringBuilder(candidato);
+				continue;
+			}
+			if (!actual.isEmpty()) {
+				renglones.add(actual.toString());
+				actual = new StringBuilder();
+			}
+			String resto = palabra;
+			while (fuente.getWidthPoint(resto, tamano) > ancho) {
+				int corte = resto.length() - 1;
+				while (corte > 1 && fuente.getWidthPoint(resto.substring(0, corte), tamano) > ancho) {
+					corte--;
+				}
+				int guion = resto.lastIndexOf('-', corte - 1);
+				if (guion > 0) {
+					corte = guion + 1;
+				}
+				renglones.add(resto.substring(0, corte));
+				resto = resto.substring(corte);
+			}
+			actual = new StringBuilder(resto);
+		}
+		if (!actual.isEmpty()) {
+			renglones.add(actual.toString());
+		}
+		return renglones;
+	}
+
+	/** Escribe los renglones hacia abajo desde la línea base dada; devuelve dónde termina el último. */
+	private static float escribir(PdfContentByte lienzo, List<String> renglones, BaseFont fuente, float tamano,
+			Color color, float x, float base) {
+		lienzo.beginText();
+		lienzo.setFontAndSize(fuente, tamano);
+		lienzo.setColorFill(color);
+		float linea = base;
+		for (String renglon : renglones) {
+			lienzo.showTextAligned(Element.ALIGN_LEFT, renglon, x, linea, 0);
+			linea -= tamano * INTERLINEADO;
+		}
+		lienzo.endText();
+		return linea + tamano * INTERLINEADO - tamano * 0.25f;
 	}
 
 	private static BaseFont fuente(String nombre) {

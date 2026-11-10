@@ -78,6 +78,8 @@ Los tres usan la contraseña de `SIGIT_SEED_PASSWORD`. Si la variable está vac�
 ./mvnw test
 ```
 
+Además de las pruebas, genera el reporte de cobertura de JaCoCo en `target/site/jacoco/index.html` (Tarea 6: 92 % de las líneas).
+
 Las pruebas corren contra MySQL 8.4 real con Testcontainers, así que Docker debe estar abierto. Cubren CP-01, CP-03, la matriz de rol por ruta, la sesión, la gestión de usuarios y, con un Tomcat embebido real, las páginas de error y las cabeceras de seguridad.
 
 ## Desplegar en Apache Tomcat 11
@@ -99,7 +101,9 @@ Las pruebas corren contra MySQL 8.4 real con Testcontainers, así que Docker deb
 
 3. Copia `sigit.war` a `$CATALINA_HOME/webapps/`. Queda en `/sigit`; para servirlo en la raíz, cópialo como `ROOT.war`.
 
-Con el perfil `prod`, la aplicación no arranca si falta alguna variable, y la cookie de sesión solo viaja por HTTPS. Si Nginx termina el HTTPS delante de Tomcat, configura `RemoteIpValve` en `server.xml` para que las redirecciones usen `https`.
+Con el perfil `prod`, la aplicación no arranca si falta alguna variable, y la cookie de sesión solo viaja por HTTPS.
+
+SIGIT registra las fechas en la zona de `SIGIT_ZONA_HORARIA` (por omisión `America/Merida`), aunque el servidor o el contenedor estén en UTC. Para que los códigos QR lleven la dirección pública, define también `SIGIT_URL_PUBLICA`. Si Nginx termina el HTTPS delante de Tomcat, configura `RemoteIpValve` en `server.xml` para que las redirecciones usen `https`.
 
 ## Configuración del módulo
 

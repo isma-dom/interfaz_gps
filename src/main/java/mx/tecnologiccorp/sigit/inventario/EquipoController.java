@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import mx.tecnologiccorp.sigit.catalogos.Area;
 import mx.tecnologiccorp.sigit.qr.QrService;
@@ -33,6 +34,12 @@ import mx.tecnologiccorp.sigit.seguridad.UsuarioSesion;
 @Controller
 @RequestMapping("/equipos")
 public class EquipoController {
+
+	/**
+	 * Tarea 6 (D-06): el identificador del equipo es un número; «/equipos/abc» no es un equipo (404), no una
+	 * petición mal formada (400). Hasta 18 cifras, para que siempre quepa en un Long.
+	 */
+	public static final String ID = "/{id:\\d{1,18}}";
 
 	/** Área que no existe: un usuario Consulta sin área asignada no ve ningún equipo. */
 	private static final long SIN_AREA = -1L;
@@ -69,6 +76,14 @@ public class EquipoController {
 		}
 		FiltroEquipos filtro = FiltroEquipos.de(q, areaId, tipoId, estado, orden);
 		Page<FilaEquipo> equipos = servicio.buscar(filtro, pagina - 1).map(FilaEquipo::de);
+		// Tarea 6 (D-04): una página que ya no existe (por ejemplo, tras una baja) lleva a la última, no a
+		// «Ningún equipo coincide».
+		if (pagina > 1 && equipos.getTotalPages() > 0 && pagina > equipos.getTotalPages()) {
+			return "redirect:" + ServletUriComponentsBuilder.fromCurrentRequest()
+				.replaceQueryParam("pagina", equipos.getTotalPages())
+				.build()
+				.toUriString();
+		}
 		modelo.addAttribute("equipos", equipos);
 		// Con miles de equipos no caben todos los números: se muestran hasta cinco alrededor de la actual.
 		int actual = equipos.getNumber() + 1;
@@ -88,7 +103,7 @@ public class EquipoController {
 	}
 
 	/** Ficha del equipo: toda su información, también tras guardar una edición. */
-	@GetMapping("/{id}")
+	@GetMapping(ID)
 	public String detalle(@PathVariable Long id, @AuthenticationPrincipal UsuarioSesion usuario, Model modelo) {
 		Equipo equipo = visible(id, usuario);
 		modelo.addAttribute("e", equipo);
@@ -142,7 +157,7 @@ public class EquipoController {
 		return formulario(modelo, formulario, "equipos/registro");
 	}
 
-	@GetMapping("/{id}/editar")
+	@GetMapping(ID + "/editar")
 	public String editar(@PathVariable Long id, Model modelo, RedirectAttributes redireccion) {
 		Equipo equipo = servicio.consultar(id).orElseThrow(() -> new EquipoNoEncontrado(id));
 		if (equipo.getEstado() == EstadoEquipo.BAJA) {
@@ -153,10 +168,14 @@ public class EquipoController {
 		return formulario(modelo, EquipoForm.de(equipo), "equipos/edicion");
 	}
 
-	@PostMapping("/{id}")
+	@PostMapping(ID)
 	public String actualizar(@PathVariable Long id, @Valid @ModelAttribute("equipo") EquipoForm formulario,
 			BindingResult resultado, Model modelo, RedirectAttributes redireccion) {
 		Equipo existente = servicio.consultar(id).orElseThrow(() -> new EquipoNoEncontrado(id));
+		if (resultado.hasFieldErrors("version")) {
+			// Tarea 6 (D-08): una versión que no es número no es de ningún formulario abierto.
+			return conDatosActuales(id, EdicionRechazada.simultanea().getMessage(), modelo);
+		}
 		marcarDuplicados(formulario, id, resultado);
 		if (!resultado.hasErrors()) {
 			try {
@@ -188,7 +207,7 @@ public class EquipoController {
 	 * Baja (Tarea 4, RN-04): primero una página que pide confirmación, con los datos del equipo, el motivo
 	 * por escrito y la casilla de que es definitiva. Solo para Candidato a baja o Revisión pendiente.
 	 */
-	@GetMapping("/{id}/baja")
+	@GetMapping(ID + "/baja")
 	public String confirmarBaja(@PathVariable Long id, Model modelo, RedirectAttributes redireccion) {
 		Equipo equipo = servicio.consultar(id).orElseThrow(() -> new EquipoNoEncontrado(id));
 		if (!equipo.getEstado().admiteBaja()) {
@@ -200,11 +219,15 @@ public class EquipoController {
 		return vistaBaja(modelo, equipo, formulario);
 	}
 
-	@PostMapping("/{id}/baja")
+	@PostMapping(ID + "/baja")
 	public String darDeBaja(@PathVariable Long id, @Valid @ModelAttribute("baja") BajaForm formulario,
 			BindingResult resultado, @AuthenticationPrincipal UsuarioSesion usuario, Model modelo,
 			RedirectAttributes redireccion) {
 		Equipo equipo = servicio.consultar(id).orElseThrow(() -> new EquipoNoEncontrado(id));
+		if (resultado.hasFieldErrors("version")) {
+			redireccion.addFlashAttribute("error", BajaNoPermitida.simultanea().getMessage());
+			return "redirect:/equipos/" + id;
+		}
 		if (resultado.hasErrors()) {
 			return vistaBaja(modelo, equipo, formulario);
 		}

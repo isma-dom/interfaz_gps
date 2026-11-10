@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +29,10 @@ import mx.tecnologiccorp.sigit.seguridad.UsuarioRepository;
  */
 @Configuration(proxyBeanMethods = false)
 public class SeguridadConfig {
+
+	static final String POLITICA_DE_CONTENIDO = "default-src 'self'; script-src 'self'; style-src 'self'; "
+			+ "img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; "
+			+ "form-action 'self'; frame-ancestors 'none'";
 
 	@Bean
 	PasswordEncoder cifradorDeContrasenas() {
@@ -71,6 +76,12 @@ public class SeguridadConfig {
 				.deleteCookies("JSESSIONID"))
 			.exceptionHandling(errores -> errores.accessDeniedHandler(accesoDenegado)
 				.authenticationEntryPoint(sinSesion()))
+			// Tarea 6 (D-03, PS-15): todo se sirve desde el propio WAR, sin scripts ni estilos en línea, así que
+			// la política puede ser estricta. data: es para los íconos SVG que Bootstrap lleva dentro de su CSS.
+			.headers(cabeceras -> cabeceras
+				.contentSecurityPolicy(csp -> csp.policyDirectives(POLITICA_DE_CONTENIDO))
+				.referrerPolicy(referencia -> referencia.policy(ReferrerPolicy.SAME_ORIGIN))
+				.permissionsPolicyHeader(permisos -> permisos.policy("camera=(self), microphone=(), geolocation=()")))
 			.addFilterBefore(new FiltroUsuarioActivo(usuarios), AuthorizationFilter.class);
 		return http.build();
 	}

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import mx.tecnologiccorp.sigit.inventario.AccesoAEquipos;
+import mx.tecnologiccorp.sigit.inventario.EquipoController;
 import mx.tecnologiccorp.sigit.inventario.Equipo;
 import mx.tecnologiccorp.sigit.inventario.EquipoNoEncontrado;
 import mx.tecnologiccorp.sigit.inventario.EquipoRepository;
@@ -63,7 +64,7 @@ public class QrController {
 		return "redirect:/equipos/" + acceso.visiblePorQr(uuid, usuario).getId();
 	}
 
-	@GetMapping("/equipos/{id}/qr.svg")
+	@GetMapping("/equipos" + EquipoController.ID + "/qr.svg")
 	public ResponseEntity<String> svg(@PathVariable Long id,
 			@RequestParam(name = "descargar", required = false) String descargar,
 			@AuthenticationPrincipal UsuarioSesion usuario) {
@@ -73,7 +74,7 @@ public class QrController {
 				descargar != null).body(svg);
 	}
 
-	@GetMapping("/equipos/{id}/qr.png")
+	@GetMapping("/equipos" + EquipoController.ID + "/qr.png")
 	public ResponseEntity<byte[]> png(@PathVariable Long id,
 			@RequestParam(name = "descargar", required = false) String descargar,
 			@AuthenticationPrincipal UsuarioSesion usuario) {
@@ -83,7 +84,7 @@ public class QrController {
 	}
 
 	/** La etiqueta de un solo equipo, desde su ficha. */
-	@GetMapping("/equipos/{id}/etiqueta.pdf")
+	@GetMapping("/equipos" + EquipoController.ID + "/etiqueta.pdf")
 	public Object etiqueta(@PathVariable Long id, RedirectAttributes redireccion) {
 		Equipo equipo = equipos.findById(id).orElseThrow(() -> new EquipoNoEncontrado(id));
 		if (equipo.getEstado() == EstadoEquipo.BAJA) {
@@ -97,8 +98,15 @@ public class QrController {
 	@GetMapping("/equipos/etiquetas")
 	public Object etiquetas(@RequestParam(name = "id", required = false) List<Long> ids,
 			RedirectAttributes redireccion) {
-		List<Equipo> elegidos = ids == null ? List.of()
-				: equipos.findAllById(ids.stream().distinct().limit(MAXIMO_ETIQUETAS).toList())
+		List<Long> distintos = ids == null ? List.of() : ids.stream().distinct().toList();
+		if (distintos.size() > MAXIMO_ETIQUETAS) {
+			// Tarea 6 (D-05): antes se recortaban sin avisar.
+			redireccion.addFlashAttribute("error", "Puedes imprimir hasta " + MAXIMO_ETIQUETAS
+					+ " etiquetas a la vez (10 hojas). Selecciona menos equipos.");
+			return "redirect:/equipos";
+		}
+		List<Equipo> elegidos = distintos.isEmpty() ? List.of()
+				: equipos.findAllById(distintos)
 					.stream()
 					.filter(e -> e.getEstado() != EstadoEquipo.BAJA)
 					.sorted(Comparator.comparing(Equipo::getNumInventario))

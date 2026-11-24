@@ -8,7 +8,11 @@
     <title th:text="${titulo} + ' | SIGIT'">SIGIT</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/dist/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.min.css}">
+    <!--/* Tarea 7: tema.css lleva los colores del cliente; va antes de sigit.css, que solo usa sus variables. */-->
+    <link rel="stylesheet" th:href="@{/css/tema.css}">
     <link rel="stylesheet" th:href="@{/css/sigit.css}">
+    <link rel="icon" type="image/png" sizes="64x64" th:href="@{/img/favicon.png}">
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/img/favicon-180.png}">
     <script defer th:src="@{/webjars/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
     <script defer th:src="@{/js/sigit.js}"></script>
 </head>

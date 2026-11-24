@@ -56,6 +56,15 @@ El Administrador registra equipos en Equipos → Nuevo equipo (http://localhost:
 - **Imprimir** (solo Administrador): etiquetas de 5 × 3 cm en PDF tamaño carta, 24 por hoja, con el código, el número de inventario y el área. Una desde la ficha (`/equipos/{id}/etiqueta.pdf`) o varias seleccionándolas en el listado (`/equipos/etiquetas?id=…`). Los equipos dados de baja ya no llevan etiqueta.
 - Librerías: ZXing 3.5.4 (genera el código) y OpenPDF 3.0.5 (el PDF).
 
+## Cambios solicitados por el cliente (Tarea 7)
+
+La Subdirección de Administración pidió aceptar correos de Gmail y usar sus colores y su logotipo.
+
+- **Correos de Gmail:** se registran (P-11) e inician sesión (P-01) igual que cualquier otro dominio, incluido @googlemail.com. Al revisarlo, el código ya los aceptaba: ninguna validación ni regla limita el dominio. Las pruebas lo confirman, y se reforzó que la entidad `Usuario` guarde el correo sin espacios y en minúsculas aunque no llegue por el formulario. El correo sigue siendo único sin importar mayúsculas, y no cambian el bloqueo tras 5 intentos, la sesión de 30 minutos ni la política de contraseñas. No hay inicio de sesión con Google (OAuth).
+- **Colores:** viven solo en `static/css/tema.css`. Hay tres de entrada, medidos en el logotipo: primario `#5b7126` (verde de las hojas, oscurecido para el contraste), secundario `#50210d` (café de las letras) y acento `#ba4421` (naranja rojizo de la mano). Los demás tonos y las variables de Bootstrap (`--bs-primary`, etc.) se calculan a partir de ellos. `ContrasteDelTemaTest` comprueba el contraste WCAG AA (4.5:1) de cada texto y botón, así que un cambio de paleta que no cumpla hace fallar `./mvnw test`.
+- **Logotipo:** `static/img/logo.png`, en el inicio de sesión y en el encabezado de todas las páginas (sobre una placa blanca en el menú lateral; en celular, en la barra superior), con texto alternativo. El favicon (`img/favicon.png` y `img/favicon-180.png`) es el emblema de la mazorca. `/img/**` se sirve sin sesión para que se vea en el inicio de sesión.
+- Las etiquetas QR no cambian: siguen en negro sobre blanco.
+
 ## Prototipo de equipos (Tarea 1)
 
 Con el perfil `dev` existe un prototipo navegable de las pantallas P-03 (listado) y P-05 (registro y edición) de equipos, con 26 equipos de ejemplo en memoria: http://localhost:8080/prototipos/equipos. Registrar, editar y dar de baja es solo del Administrador; Consulta ve únicamente su área. Los equipos se pierden al reiniciar: guardarlos en MySQL es una tarea posterior.
@@ -143,11 +152,12 @@ Los documentos del proyecto no definen estos puntos:
 - Los parámetros de obsolescencia viven en `application.properties` hasta que exista la tabla `parametros` y su pantalla.
 - La edición de equipos todavía no deja rastro en la bitácora: se agrega con la Bitácora (Sprint 4).
 - El bloqueo de cuentas vive en memoria: un reinicio del servidor lo levanta.
+- Colores del cliente (Tarea 7): se midieron en la imagen del logotipo que entregó; el verde y el naranja se oscurecieron para cumplir el contraste. Hay que confirmarlos con su manual de identidad.
+- Logotipo (Tarea 7): se usa el del H. Ayuntamiento de Benito Juárez 2026-2029 en PNG de 657 × 215 px. Conviene pedir la versión vectorial (SVG) y confirmar que sea el logotipo que corresponde a la Biblioteca.
 
 ## Pendiente fuera de este módulo
 
 - API REST con tokens (`/api/v1/auth/login`): el evento PI-01 la exige. Las respuestas JSON 401 y 403 ya están listas para reutilizarse.
-- Logotipo oficial: sustituir el texto de `templates/fragmentos/pagina.html` y de `templates/login.html`.
 - Bitácora (Sprint 4), catálogo de áreas (P-10) y el resto de las pantallas, que hoy muestran «todavía no está disponible».
 - Los documentos de diseño siguen describiendo Laravel; hay que actualizarlos al stack Java.
 

@@ -12,13 +12,10 @@
     <div class="app-lateral">
         <div class="offcanvas-lg offcanvas-start h-100" id="menu-lateral" tabindex="-1" aria-label="Menú">
             <div class="d-flex align-items-start justify-content-between">
-                <!--/* Sustituir por el logotipo oficial cuando el cliente lo entregue (actividad 3.2). */-->
+                <!--/* Tarea 7: logotipo del cliente, sobre una placa blanca para que se lea en el menú oscuro. */-->
                 <a class="app-marca" th:href="@{/}">
-                    <span class="logotipo" aria-hidden="true"><i class="bi bi-laptop"></i></span>
-                    <span class="app-marca__texto">
-                        <span class="app-marca__sigla">SIGIT</span>
-                        <span class="app-marca__institucion">Biblioteca Benito Juárez</span>
-                    </span>
+                    <img class="app-marca__logo" th:src="@{/img/logo.png}" width="657" height="215"
+                         alt="H. Ayuntamiento de Benito Juárez 2026-2029. SIGIT, ir al inicio">
                 </a>
                 <button type="button" class="btn-close m-3 d-lg-none" data-bs-dismiss="offcanvas"
                         data-bs-target="#menu-lateral" aria-label="Cerrar menú"></button>
@@ -44,6 +41,11 @@
                     data-bs-target="#menu-lateral" aria-controls="menu-lateral">
                 <i class="bi bi-list" aria-hidden="true"></i> Menú
             </button>
+            <!--/* En celular el menú lateral está oculto: el logotipo también va en el encabezado (Tarea 7). */-->
+            <a class="app-encabezado__logo d-lg-none" th:href="@{/}">
+                <img th:src="@{/img/logo.png}" width="657" height="215"
+                     alt="H. Ayuntamiento de Benito Juárez 2026-2029. SIGIT, ir al inicio">
+            </a>
             <div class="dropdown usuario-menu">
                 <button class="usuario-menu__boton dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="usuario-menu__datos d-none d-sm-block">

@@ -60,7 +60,9 @@ public class Usuario {
 
 	public Usuario(String nombre, String correo, String passwordCifrado, Rol rol, Area area) {
 		this.nombre = nombre;
-		this.correo = correo;
+		// Tarea 7: el correo se guarda siempre sin espacios y en minúsculas, llegue por donde llegue, para
+		// que el inicio de sesión y la regla de correo único lo comparen igual (cualquier dominio, Gmail incluido).
+		this.correo = ProveedorDeAutenticacion.normalizarCorreo(correo);
 		this.password = passwordCifrado;
 		this.rol = rol;
 		this.area = area;
@@ -108,7 +110,7 @@ public class Usuario {
 	}
 
 	public void setCorreo(String correo) {
-		this.correo = correo;
+		this.correo = ProveedorDeAutenticacion.normalizarCorreo(correo);
 	}
 
 	public String getPassword() {

@@ -1,0 +1,61 @@
+/*
+ * Tema de SIGIT (Tarea 7): los colores del cliente, en un solo lugar.
+ *
+ * Para cambiar la paleta, edita solo los tres colores de entrada y sus tripletes RGB. Todo lo demás
+ * (hover, fondos tenues, foco, variables de Bootstrap) se calcula a partir de ellos con color-mix().
+ * Después corre ./mvnw test: ContrasteDelTemaTest comprueba el contraste WCAG AA (4.5:1).
+ *
+ * Colores medidos en el logotipo del H. Ayuntamiento de Benito Juárez 2026-2029 que entregó el cliente
+ * (Tarea 7): el café de las letras (#50210d), el verde de las hojas (#799732) y el naranja rojizo de la mano
+ * (#c44823). El verde da 3.3:1 con texto blanco, así que se usa 25 % más oscuro; el naranja se oscurece
+ * 5 % para tener margen sobre los fondos tenues. Hay que confirmarlos con el manual de identidad del cliente.
+ *
+ *   primario   → botones de acción principal (btn-primary) y --bs-primary
+ *   secundario → menú lateral y elementos de navegación
+ *   acento     → enlaces, búsqueda, paginación, números de sección y foco
+ *
+ * Las etiquetas QR no usan estos colores: se imprimen siempre en negro sobre blanco.
+ */
+:root {
+    /* ---- Colores de entrada ---- */
+    --sigit-primario: #5b7126;          /* verde de las hojas (#799732), 25 % más oscuro para AA */
+    --sigit-primario-rgb: 91, 113, 38;
+    --sigit-secundario: #50210d;        /* café de las letras, tal cual */
+    --sigit-secundario-rgb: 80, 33, 13;
+    --sigit-acento: #ba4421;            /* naranja rojizo de la mano (#c44823), 5 % más oscuro */
+    --sigit-acento-rgb: 186, 68, 33;
+
+    /* ---- Tonos derivados (no editar) ---- */
+    --sigit-primario-oscuro: color-mix(in srgb, var(--sigit-primario) 82%, #000);
+    --sigit-primario-mas-oscuro: color-mix(in srgb, var(--sigit-primario) 70%, #000);
+    --sigit-primario-claro: color-mix(in srgb, var(--sigit-primario) 22%, #fff);
+    --sigit-primario-tenue: color-mix(in srgb, var(--sigit-primario) 7%, #fff);
+    --sigit-primario-borde: color-mix(in srgb, var(--sigit-primario) 38%, #fff);
+    --sigit-primario-texto: color-mix(in srgb, var(--sigit-primario) 55%, #000);
+
+    --sigit-secundario-claro: color-mix(in srgb, var(--sigit-secundario) 88%, #fff);
+    --sigit-secundario-texto: color-mix(in srgb, var(--sigit-secundario) 14%, #fff);
+
+    --sigit-acento-oscuro: color-mix(in srgb, var(--sigit-acento) 78%, #000);
+    --sigit-acento-mas-oscuro: color-mix(in srgb, var(--sigit-acento) 62%, #000);
+    --sigit-acento-vivo: color-mix(in srgb, var(--sigit-acento) 80%, #fff);
+    --sigit-acento-tenue: color-mix(in srgb, var(--sigit-acento) 7%, #fff);
+    --sigit-acento-suave: color-mix(in srgb, var(--sigit-acento) 13%, #fff);
+
+    /* Nombres anteriores de la paleta, para que sigit.css no tenga que saber qué color es cuál. */
+    --sigit-marino: var(--sigit-secundario);
+    --sigit-marino-claro: var(--sigit-secundario-claro);
+    --sigit-azul: var(--sigit-acento);
+    --sigit-azul-oscuro: var(--sigit-acento-oscuro);
+    --sigit-turquesa: var(--sigit-primario);
+    --sigit-turquesa-oscuro: var(--sigit-primario-oscuro);
+    --sigit-turquesa-claro: var(--sigit-primario-claro);
+
+    /* ---- Bootstrap 5.3 ---- */
+    --bs-primary: var(--sigit-primario);
+    --bs-primary-rgb: var(--sigit-primario-rgb);
+    --bs-link-color: var(--sigit-acento);
+    --bs-link-color-rgb: var(--sigit-acento-rgb);
+    --bs-link-hover-color: var(--sigit-acento-oscuro);
+    --bs-focus-ring-color: rgba(var(--sigit-acento-rgb), .3);
+}

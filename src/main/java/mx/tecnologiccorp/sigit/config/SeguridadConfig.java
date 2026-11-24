@@ -45,7 +45,8 @@ public class SeguridadConfig {
 		// ProveedorDeAutenticacion se registra solo por ser un bean. Agregarlo también aquí haría
 		// que cada intento fallido contara doble (cadena local y AuthenticationManager global).
 		http.authorizeHttpRequests(reglas -> {
-				reglas.requestMatchers("/login", "/error", "/css/**", "/js/**", "/fuentes/**", "/webjars/**")
+				// /img/** (Tarea 7): el logotipo y el favicon se ven en el inicio de sesión, antes de tener sesión.
+				reglas.requestMatchers("/login", "/error", "/css/**", "/js/**", "/fuentes/**", "/img/**", "/webjars/**")
 					.permitAll();
 				// Registrar, editar y dar de baja equipos es solo del Administrador (RF-02, RN-04); consultar es
 				// de todos los roles.

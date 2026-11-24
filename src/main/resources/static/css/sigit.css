@@ -1,6 +1,7 @@
 /*
- * Estilo de SIGIT sobre Bootstrap 5.3: navegación azul marino, acciones en turquesa, tarjetas
- * blancas redondeadas y títulos en mayúsculas.
+ * Estilo de SIGIT sobre Bootstrap 5.3: tarjetas blancas redondeadas y títulos en mayúsculas.
+ * Los colores del cliente están en tema.css (Tarea 7); aquí solo se usan sus variables. Los colores
+ * de estado (errores, confirmaciones y estados de los equipos) no son de marca y se quedan aquí.
  */
 
 @font-face {
@@ -20,13 +21,6 @@
 }
 
 :root {
-    --sigit-marino: #1b2a57;
-    --sigit-marino-claro: #24366e;
-    --sigit-azul: #1e3a8a;
-    --sigit-azul-oscuro: #172e6e;
-    --sigit-turquesa: #0b8278;
-    --sigit-turquesa-oscuro: #096b63;
-    --sigit-turquesa-claro: #ccf0ec;
     --sigit-fondo: #f4f6fb;
     --sigit-texto: #1e293b;
     --sigit-texto-suave: #64748b;
@@ -41,21 +35,14 @@
     --bs-body-color: var(--sigit-texto);
     --bs-emphasis-color: var(--sigit-texto);
     --bs-secondary-color: var(--sigit-texto-suave);
-    --bs-primary: #0b8278;
-    --bs-primary-rgb: 11, 130, 120;
     --bs-danger: #b91c1c;
     --bs-danger-rgb: 185, 28, 28;
     --bs-success: #15803d;
     --bs-success-rgb: 21, 128, 61;
-    --bs-link-color: #1e3a8a;
-    --bs-link-color-rgb: 30, 58, 138;
-    --bs-link-hover-color: #172e6e;
-    --bs-link-hover-color-rgb: 23, 46, 110;
     --bs-border-color: var(--sigit-borde);
     --bs-border-radius: .5rem;
     --bs-border-radius-sm: .375rem;
     --bs-border-radius-lg: .75rem;
-    --bs-focus-ring-color: rgba(30, 58, 138, .3);
     --bs-form-invalid-color: #b91c1c;
     --bs-form-invalid-border-color: #b91c1c;
 }
@@ -94,7 +81,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .form-control:focus,
 .form-select:focus {
     border-color: #6b83c4;
-    box-shadow: 0 0 0 .25rem rgba(30, 58, 138, .15);
+    box-shadow: 0 0 0 .25rem rgba(var(--sigit-acento-rgb), .15);
 }
 
 .form-label {
@@ -104,44 +91,44 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 /* Acción principal: turquesa. */
 .btn-primary {
-    --bs-btn-bg: #0b8278;
-    --bs-btn-border-color: #0b8278;
-    --bs-btn-hover-bg: #096b63;
-    --bs-btn-hover-border-color: #096b63;
-    --bs-btn-active-bg: #075a53;
-    --bs-btn-active-border-color: #075a53;
-    --bs-btn-disabled-bg: #0b8278;
-    --bs-btn-disabled-border-color: #0b8278;
+    --bs-btn-bg: var(--sigit-primario);
+    --bs-btn-border-color: var(--sigit-primario);
+    --bs-btn-hover-bg: var(--sigit-primario-oscuro);
+    --bs-btn-hover-border-color: var(--sigit-primario-oscuro);
+    --bs-btn-active-bg: var(--sigit-primario-mas-oscuro);
+    --bs-btn-active-border-color: var(--sigit-primario-mas-oscuro);
+    --bs-btn-disabled-bg: var(--sigit-primario);
+    --bs-btn-disabled-border-color: var(--sigit-primario);
     --bs-btn-focus-shadow-rgb: 11, 130, 120;
 }
 
 .btn-outline-primary {
-    --bs-btn-color: #0b8278;
-    --bs-btn-border-color: #0b8278;
-    --bs-btn-hover-bg: #0b8278;
-    --bs-btn-hover-border-color: #0b8278;
+    --bs-btn-color: var(--sigit-primario);
+    --bs-btn-border-color: var(--sigit-primario);
+    --bs-btn-hover-bg: var(--sigit-primario);
+    --bs-btn-hover-border-color: var(--sigit-primario);
     --bs-btn-hover-color: #fff;
-    --bs-btn-active-bg: #096b63;
-    --bs-btn-active-border-color: #096b63;
-    --bs-btn-disabled-color: #0b8278;
-    --bs-btn-disabled-border-color: #0b8278;
+    --bs-btn-active-bg: var(--sigit-primario-oscuro);
+    --bs-btn-active-border-color: var(--sigit-primario-oscuro);
+    --bs-btn-disabled-color: var(--sigit-primario);
+    --bs-btn-disabled-border-color: var(--sigit-primario);
     --bs-btn-focus-shadow-rgb: 11, 130, 120;
 }
 
 /* Inicio de sesión y paginación: azul marino. */
 .btn-marino {
     --bs-btn-color: #fff;
-    --bs-btn-bg: #1e3a8a;
-    --bs-btn-border-color: #1e3a8a;
+    --bs-btn-bg: var(--sigit-acento);
+    --bs-btn-border-color: var(--sigit-acento);
     --bs-btn-hover-color: #fff;
-    --bs-btn-hover-bg: #172e6e;
-    --bs-btn-hover-border-color: #172e6e;
+    --bs-btn-hover-bg: var(--sigit-acento-oscuro);
+    --bs-btn-hover-border-color: var(--sigit-acento-oscuro);
     --bs-btn-active-color: #fff;
-    --bs-btn-active-bg: #12245a;
-    --bs-btn-active-border-color: #12245a;
+    --bs-btn-active-bg: var(--sigit-acento-mas-oscuro);
+    --bs-btn-active-border-color: var(--sigit-acento-mas-oscuro);
     --bs-btn-disabled-color: #fff;
-    --bs-btn-disabled-bg: #1e3a8a;
-    --bs-btn-disabled-border-color: #1e3a8a;
+    --bs-btn-disabled-bg: var(--sigit-acento);
+    --bs-btn-disabled-border-color: var(--sigit-acento);
 }
 
 /* Cancelar: gris, como en el diseño de referencia. */
@@ -190,8 +177,8 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 .btn-link {
-    --bs-btn-color: #1e3a8a;
-    --bs-btn-hover-color: #172e6e;
+    --bs-btn-color: var(--sigit-acento);
+    --bs-btn-hover-color: var(--sigit-acento-oscuro);
 }
 
 .btn-close {
@@ -203,9 +190,11 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     --bs-btn-padding-x: 0;
     --bs-btn-padding-y: 0;
     --bs-btn-color: #475569;
-    --bs-btn-hover-color: #1e3a8a;
-    --bs-btn-hover-bg: #eef2ff;
-    --bs-btn-active-bg: #e0e7ff;
+    --bs-btn-hover-color: var(--sigit-acento);
+    --bs-btn-hover-bg: var(--sigit-acento-tenue);
+    --bs-btn-active-bg: var(--sigit-acento-suave);
+    /* Sobre el fondo suave, el acento oscuro: el acento normal no llega a 4.5:1 (Tarea 7). */
+    --bs-btn-active-color: var(--sigit-acento-oscuro);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -226,13 +215,13 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     --bs-pagination-color: #334155;
     --bs-pagination-border-color: transparent;
     --bs-pagination-bg: transparent;
-    --bs-pagination-hover-color: #1e3a8a;
-    --bs-pagination-hover-bg: #e0e7ff;
+    --bs-pagination-hover-color: var(--sigit-acento-oscuro);
+    --bs-pagination-hover-bg: var(--sigit-acento-suave);
     --bs-pagination-hover-border-color: transparent;
-    --bs-pagination-focus-color: #1e3a8a;
-    --bs-pagination-focus-box-shadow: 0 0 0 .25rem rgba(30, 58, 138, .2);
-    --bs-pagination-active-bg: #1e3a8a;
-    --bs-pagination-active-border-color: #1e3a8a;
+    --bs-pagination-focus-color: var(--sigit-acento);
+    --bs-pagination-focus-box-shadow: 0 0 0 .25rem rgba(var(--sigit-acento-rgb), .2);
+    --bs-pagination-active-bg: var(--sigit-acento);
+    --bs-pagination-active-border-color: var(--sigit-acento);
     --bs-pagination-disabled-bg: transparent;
     --bs-pagination-disabled-border-color: transparent;
     --bs-pagination-border-radius: .5rem;
@@ -253,7 +242,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 .modal-backdrop {
-    --bs-backdrop-bg: #1b2a57;
+    --bs-backdrop-bg: var(--sigit-secundario);
     --bs-backdrop-opacity: .55;
 }
 
@@ -268,20 +257,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 .saltar-contenido:focus {
     top: 1rem;
-}
-
-/* Logotipo: cuadro azul con una laptop. Sustituir por el oficial cuando el cliente lo entregue. */
-.logotipo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: .75rem;
-    background: linear-gradient(160deg, #2c4fb3, #1e3a8a);
-    color: #7dd3fc;
-    font-size: 1.5rem;
-    box-shadow: 0 6px 14px rgba(30, 58, 138, .25);
 }
 
 /* ---------- P-01: inicio de sesión ---------- */
@@ -312,11 +287,12 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     max-width: 24rem;
 }
 
-.acceso-formulario .logotipo {
-    width: 4rem;
-    height: 4rem;
-    border-radius: 1rem;
-    font-size: 2rem;
+/* Tarea 7: logotipo del cliente en el inicio de sesión. */
+.acceso-logo {
+    display: block;
+    width: 100%;
+    max-width: 17rem;
+    height: auto;
 }
 
 .acceso-formulario h1 {
@@ -380,7 +356,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     margin: .5rem 0 0;
     padding: .75rem 1rem;
     border-radius: .5rem;
-    background: #eef2ff;
+    background: var(--sigit-acento-tenue);
     text-align: left;
     font-size: .9375rem;
 }
@@ -442,7 +418,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     margin: 0 0 2.5rem;
     font-size: 1.25rem;
     line-height: 1.5;
-    color: #dbe4ff;
+    color: var(--sigit-secundario-texto);
 }
 
 .acceso-ilustracion {
@@ -456,7 +432,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     max-height: 60vh;
     padding: 2rem;
     border-radius: 1.5rem;
-    background: #1e3a8a;
+    background: var(--sigit-secundario-claro);
 }
 
 .acceso-ilustracion svg {
@@ -468,7 +444,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 .acceso-ilustracion p {
     margin: 1.5rem 0 0;
     font-size: 1.125rem;
-    color: #dbe4ff;
+    color: var(--sigit-secundario-texto);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -523,35 +499,25 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     filter: invert(1) grayscale(1) brightness(2);
 }
 
+/* Tarea 7: el logotipo del cliente tiene letras café sobre blanco, así que va sobre una placa blanca. */
 .app-marca {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    padding: 1.5rem 1.25rem 1.25rem;
-    color: #fff;
+    display: block;
+    margin: 1.25rem 1rem 1rem;
+    padding: .625rem .75rem;
+    border-radius: .75rem;
+    background: #fff;
     text-decoration: none;
 }
 
-.app-marca:hover,
-.app-marca:focus {
-    color: #fff;
+.app-marca:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
 }
 
-.app-marca__texto {
-    line-height: 1.15;
-}
-
-.app-marca__sigla {
+.app-marca__logo {
     display: block;
-    font-size: 1.375rem;
-    font-weight: 700;
-    letter-spacing: .02em;
-}
-
-.app-marca__institucion {
-    display: block;
-    font-size: .8125rem;
-    color: #b8c4e6;
+    width: 100%;
+    height: auto;
 }
 
 .app-menu {
@@ -571,7 +537,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     min-height: 2.875rem;
     padding: .5rem .875rem;
     border-radius: .625rem;
-    color: #d6deef;
+    color: var(--sigit-secundario-texto);
     text-decoration: none;
 }
 
@@ -618,6 +584,18 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     padding: .5rem 1rem;
     background: #fff;
     border-bottom: 1px solid var(--sigit-borde);
+}
+
+/* Logotipo del cliente en el encabezado de celular y tableta (Tarea 7). */
+.app-encabezado__logo {
+    flex: 0 1 8.5rem;
+    min-width: 0;
+}
+
+.app-encabezado__logo img {
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 @media (min-width: 768px) {
@@ -675,7 +653,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     width: 2.375rem;
     height: 2.375rem;
     border-radius: 50%;
-    background: #1e3a8a;
+    background: var(--sigit-acento);
     color: #fff;
     font-weight: 700;
     font-size: .9375rem;
@@ -930,9 +908,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     margin-left: .375rem;
     padding: 0 .375rem;
     border-radius: .375rem;
-    background: #e0e7ff;
+    background: var(--sigit-acento-suave);
     font-size: .8125rem;
-    color: #1e3a8a;
+    color: var(--sigit-acento-oscuro);
 }
 
 .formulario-usuario {
@@ -1015,7 +993,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     padding-inline: 1.375rem;
     text-transform: uppercase;
     letter-spacing: .03em;
-    box-shadow: 0 6px 14px rgba(11, 130, 120, .25);
+    box-shadow: 0 6px 14px rgba(var(--sigit-primario-rgb), .25);
 }
 
 .aviso-area {
@@ -1025,7 +1003,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     margin-bottom: 1rem;
     padding: .75rem 1rem;
     border-radius: .625rem;
-    background: #eef2ff;
+    background: var(--sigit-acento-tenue);
 }
 
 .tabla-equipos__seleccion {
@@ -1115,7 +1093,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     margin: .75rem 0 0;
     padding: .5rem .75rem;
     border-radius: .5rem;
-    background: #eef2ff;
+    background: var(--sigit-acento-tenue);
     font-size: .9375rem;
 }
 
@@ -1288,7 +1266,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     width: 1.75rem;
     height: 1.75rem;
     border-radius: 50%;
-    background: #1e3a8a;
+    background: var(--sigit-acento);
     color: #fff;
     font-size: .875rem;
 }
@@ -1456,7 +1434,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     padding: 1.25rem 1.5rem;
     border-radius: .75rem;
     background: #fff;
-    border: 1px solid #a7e3d6;
+    border: 1px solid var(--sigit-primario-borde);
     box-shadow: inset 4px 0 0 #15803d;
 }
 
@@ -1570,14 +1548,14 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 /* Lo que cambió en la última edición: borde y etiqueta, no solo color. */
 .dato--cambiado {
     box-shadow: inset 4px 0 0 var(--sigit-turquesa);
-    background: #effaf8 !important;
+    background: var(--sigit-primario-tenue) !important;
 }
 
 .marca-cambio {
     padding: .0625rem .5rem;
     border-radius: 1rem;
     background: var(--sigit-turquesa-claro);
-    color: #064e48;
+    color: var(--sigit-primario-texto);
     font-size: .75rem;
     font-weight: 700;
 }
